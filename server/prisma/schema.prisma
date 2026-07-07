@@ -1,13 +1,88 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
+}
+
+// --- ENUMS ---
+// Enums restrict columns to specific, safe values.
+
+enum Role {
+  ADMIN
+  MARKETING
+  COMMUNITY
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum FormType {
+  MARKETING
+  COMMUNITY
+}
+
+enum InputType {
+  TEXT
+  NUMBER
+  DATE
+  DROPDOWN
+  MULTI_SELECT
+  YES_NO
+}
+
+// --- MODELS (TABLES) ---
+
+// 1. Users Table
+// Handles authentication and role-based access.
+model User {
+  id           String     @id @default(uuid())
+  employeeId   String     @unique // The visible User ID (e.g., "MKT-001", "COM-002")
+  name         String
+  passwordHash String // Hashed password for security
+  role         Role
+  status       UserStatus @default(ACTIVE) // Allows Admins to disable accounts
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relationship: A user can have many submissions
+  submissions Submission[]
+}
+
+// 2. Field Definitions Table (The Dynamic Form Engine)
+// Stores the specific questions/fields configured by the Admin.
+model FieldDefinition {
+  id           String    @id @default(uuid())
+  formType     FormType // Is this for Marketing or Community?
+  fieldLabel   String // e.g., "Number of Children"
+  inputType    InputType
+  isRequired   Boolean   @default(false)
+  options      Json? // Stores an array of strings for dropdown choices (e.g., ["Yes", "No", "Maybe"])
+  displayOrder Int       @default(0) // Controls the UI rendering order
+  isActive     Boolean   @default(true) // Instead of deleting fields, we "soft delete" them by making them inactive
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// 3. Submissions Table
+// Stores the actual data collected in the field.
+model Submission {
+  id          String   @id @default(uuid())
+  associateId String // Foreign Key linking to User
+  formType    FormType
+
+  // The actual answers submitted by the associate (Flexible JSON)
+  submissionData Json
+
+  // A snapshot of the exact Field Definitions active at the time of submission.
+  // This solves the "Form Versioning Problem" so old records don't break if Admins change fields later.
+  schemaSnapshot Json
+
+  submittedAt DateTime @default(now()) // Immutable timestamp for audit trails
+
+  // Defining the relational link to the User model
+  associate User @relation(fields: [associateId], references: [id])
 }
