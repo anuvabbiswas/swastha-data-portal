@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* We can define our custom Inter font directly in the new v4 theme block */
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  /* Tailwind v4 exposes its color palette as native CSS variables */
+  background-color: var(--color-slate-50);
+  font-family: var(--font-sans);
+}
