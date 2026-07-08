@@ -8,4 +8,14 @@ export default defineConfig({
     react(),
     tailwindcss(), // Injects Tailwind v4 directly into our build process
   ],
+  server: {
+    proxy: {
+      // Any request starting with /api will be routed to our Express backend
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 })

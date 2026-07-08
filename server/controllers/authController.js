@@ -26,12 +26,36 @@ exports.login = async (req, res) => {
       where: { employeeId },
     });
 
-    // 3. Verify the user exists, the role matches, and the password is correct
-    if (!user || user.role !== role || !(await bcrypt.compare(password, user.passwordHash))) {
+    // // (Old) 3. Verify the user exists, the role matches, and the password is correct
+    // if (!user || user.role !== role || !(await bcrypt.compare(password, user.passwordHash))) {
+    //   return res.status(401).json({
+    //     status: 'fail',
+    //     // Generic error message as required by AUTH-1 in the PRD
+    //     message: 'Invalid credentials. Please try again.',
+    //   });
+    // }
+
+    // (New) 3. Verify the user exists, the role matches, and the password is correct
+    // 3.1 Check whether the employee exists
+    if (!user) {
       return res.status(401).json({
         status: 'fail',
-        // Generic error message as required by AUTH-1 in the PRD
-        message: 'Invalid credentials. Please try again.',
+        message: 'User ID does not exist.',
+      });
+    }
+    // 3.2 Check whether the selected role is correct
+    if (user.role !== role) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Incorrect role selected.',
+      });
+    }
+    // 3.3 Check the password
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordMatch) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Incorrect password.',
       });
     }
 
