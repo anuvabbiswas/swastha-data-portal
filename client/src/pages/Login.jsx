@@ -1,17 +1,7 @@
-// import React from 'react';
-
-// export default function Login() {
-//   return (
-//     <div className="flex h-screen items-center justify-center bg-slate-50">
-//       <h1 className="text-2xl font-bold text-slate-800">Login Page (Placeholder)</h1>
-//     </div>
-//   );
-// }
-
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Activity } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import logo from '../assets/logo.png';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -71,11 +61,13 @@ export default function Login() {
         
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-blue-600 p-3 rounded-xl shadow-sm mb-4">
-            <Activity className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Swastha Hospital</h1>
-          <h2 className="text-lg font-semibold text-slate-700 mb-1">Data Collection Portal</h2>
+          <img
+            src={logo}
+            alt="Swastha Hospital Logo"
+            className="w-75 h-24 object-contain mb-5"
+          />
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Data Collection Portal</h1>
+          {/* <h2 className="text-lg font-semibold text-slate-700 mb-1">Data Collection Portal</h2> */}
           <p className="text-sm text-slate-500">Please log in to your account</p>
         </div>
 
