@@ -6,6 +6,7 @@ require('dotenv').config();
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const fieldRoutes = require('./routes/fieldRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/fields', fieldRoutes);
 
 // Server Initialization
 const PORT = process.env.PORT || 5000;
