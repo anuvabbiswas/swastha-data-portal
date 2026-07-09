@@ -15,4 +15,8 @@ router.route('/')
   .get(userController.getAllUsers)
   .post(userController.createUser);
 
+// Action Routes
+router.patch('/:id/status', userController.toggleUserStatus);
+router.patch('/:id/reset-password', userController.resetPassword);
+
 module.exports = router;
