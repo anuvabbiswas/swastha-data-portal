@@ -57,3 +57,23 @@ exports.getMySubmissions = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to fetch your submissions.' });
   }
 };
+
+// 3. Fetch ALL submissions for the Admin Audit view
+exports.getAllSubmissions = async (req, res) => {
+  try {
+    const submissions = await prisma.submission.findMany({
+      include: {
+        // This acts like a SQL JOIN, fetching the submitter's details
+        associate: {
+          select: { name: true, employeeId: true }
+        }
+      },
+      orderBy: { submittedAt: 'desc' }
+    });
+
+    res.status(200).json({ status: 'success', data: { submissions } });
+  } catch (error) {
+    console.error("Admin Fetch Submissions Error:", error);
+    res.status(500).json({ status: 'error', message: 'Failed to fetch all submissions.' });
+  }
+};
