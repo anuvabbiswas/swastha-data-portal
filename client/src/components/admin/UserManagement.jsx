@@ -76,7 +76,7 @@ export default function UserManagement() {
 
   // --- NEW: Reset Password Handler ---
   const handleResetPassword = async (userId) => {
-    const newPassword = window.prompt('Enter the new temporary password for this user:');
+    const newPassword = window.prompt('Enter the new password for this user:');
     if (!newPassword) return; // User cancelled the prompt
 
     try {
@@ -125,7 +125,7 @@ export default function UserManagement() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Temporary Password</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
               <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
             </div>
             <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700">
