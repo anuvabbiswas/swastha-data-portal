@@ -10,6 +10,7 @@ router.use(authMiddleware.protect);
 // 2. Associate Routes (Only Marketing & Community)
 router.post('/', authMiddleware.restrictTo('MARKETING', 'COMMUNITY'), submissionController.createSubmission);
 router.get('/me', authMiddleware.restrictTo('MARKETING', 'COMMUNITY'), submissionController.getMySubmissions);
+router.patch('/:id', authMiddleware.restrictTo('MARKETING', 'COMMUNITY'), submissionController.updateSubmission);
 
 // 3. Admin Routes (Only Admin)
 router.get('/all', authMiddleware.restrictTo('ADMIN'), submissionController.getAllSubmissions);
