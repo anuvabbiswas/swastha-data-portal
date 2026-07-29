@@ -77,3 +77,29 @@ exports.deactivateField = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to deactivate field.' });
   }
 };
+
+// Bulk update the display order of fields
+exports.reorderFields = async (req, res) => {
+  try {
+    const { fields } = req.body; // Expects an array: [{ id: "123", displayOrder: 0 }, ...]
+
+    if (!fields || !Array.isArray(fields)) {
+      return res.status(400).json({ status: 'fail', message: 'Invalid payload.' });
+    }
+
+    // Use a Prisma transaction to ensure ALL fields update successfully, or NONE do.
+    const transaction = fields.map(field => 
+      prisma.fieldDefinition.update({
+        where: { id: field.id },
+        data: { displayOrder: field.displayOrder }
+      })
+    );
+
+    await prisma.$transaction(transaction);
+
+    res.status(200).json({ status: 'success', message: 'Fields reordered successfully.' });
+  } catch (error) {
+    console.error("Reorder fields error:", error);
+    res.status(500).json({ status: 'error', message: 'Failed to save new field order.' });
+  }
+};

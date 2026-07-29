@@ -15,6 +15,7 @@ router.use(authMiddleware.restrictTo('ADMIN'));
 
 // 4. POST and PATCH routes are ONLY for Admins
 router.post('/', fieldController.createField);
+router.patch('/reorder', fieldController.reorderFields);
 router.patch('/:id/deactivate', fieldController.deactivateField);
 
 module.exports = router;
