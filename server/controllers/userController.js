@@ -87,3 +87,41 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to reset password.' });
   }
 };
+
+// Edit User Details
+exports.updateUserDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { employeeId, name, role } = req.body;
+
+    // Basic validation
+    if (!employeeId || !name || !role) {
+      return res.status(400).json({ status: 'fail', message: 'All fields are required.' });
+    }
+
+    // Prevent Admin from accidentally changing their own role and locking themselves out
+    const targetUser = await prisma.user.findUnique({ where: { id } });
+    if (!targetUser) {
+      return res.status(404).json({ status: 'fail', message: 'User not found.' });
+    }
+    
+    if (targetUser.role === 'ADMIN' && role !== 'ADMIN') {
+      return res.status(403).json({ status: 'fail', message: 'Cannot demote an Admin account.' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: { employeeId, name, role },
+      select: { id: true, employeeId: true, name: true, role: true, status: true }
+    });
+
+    res.status(200).json({ status: 'success', data: { user: updatedUser } });
+  } catch (error) {
+    // Handle Unique Constraint Violation (P2002) if they enter an existing Employee ID
+    if (error.code === 'P2002') {
+      return res.status(400).json({ status: 'fail', message: 'That Employee ID is already assigned to another user.' });
+    }
+    console.error("Update User Error:", error);
+    res.status(500).json({ status: 'error', message: 'Failed to update user details.' });
+  }
+};

@@ -19,4 +19,7 @@ router.route('/')
 router.patch('/:id/status', userController.toggleUserStatus);
 router.patch('/:id/reset-password', userController.resetPassword);
 
+// Edit User Details Route
+router.patch('/:id/details', userController.updateUserDetails);
+
 module.exports = router;
