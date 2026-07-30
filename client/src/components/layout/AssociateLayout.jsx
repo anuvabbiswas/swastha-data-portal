@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FilePlus, History, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import Footer from './Footer';
 
 export default function AssociateLayout({ children, activeTab, setActiveTab }) {
   const { logout, user } = useAuth();
@@ -75,9 +76,13 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto p-4 md:p-8 pt-6">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-6 relative">
+          {children}
+          
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }
