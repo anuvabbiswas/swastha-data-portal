@@ -9,7 +9,7 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [formData, setFormData] = useState({ employeeId: '', name: '', role: 'MARKETING', password: '' });
+  const [formData, setFormData] = useState({ employeeId: '', name: '', role: '', password: '' });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
   // Search & Filter State
@@ -50,7 +50,7 @@ export default function UserManagement() {
 
       if (res.ok) {
         setFormMessage({ type: 'success', text: 'User created successfully!' });
-        setFormData({ employeeId: '', name: '', role: 'MARKETING', password: '' });
+        setFormData({ employeeId: '', name: '', role: '', password: '' });
         fetchUsers(); 
       } else {
         setFormMessage({ type: 'error', text: data.message });
@@ -145,7 +145,8 @@ export default function UserManagement() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-              <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select required value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled>Select role</option>
                 <option value="MARKETING">Marketing Associate</option>
                 <option value="COMMUNITY">Community Outreach Associate</option>
                 <option value="ADMIN">System Admin</option>
