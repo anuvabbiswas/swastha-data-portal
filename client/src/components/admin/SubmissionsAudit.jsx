@@ -118,8 +118,8 @@ export default function SubmissionsAudit() {
     <div className="p-8">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Master Submissions Audit</h2>
-          <p className="text-slate-500 mt-1">Review, filter, and export all field data.</p>
+          <h2 className="text-2xl font-bold text-slate-800">Submission History</h2>
+          <p className="text-slate-500 mt-1">Review, filter, and export data.</p>
         </div>
         
         {/* --- NEW: Export Dropdown Button --- */}
