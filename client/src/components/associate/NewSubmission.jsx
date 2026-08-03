@@ -1,4 +1,3 @@
-// client/src/components/associate/NewSubmission.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CheckCircle2 } from 'lucide-react';
@@ -12,6 +11,7 @@ export default function NewSubmission() {
   
   // This state will hold all the dynamic answers! (e.g., { "Doctor Name": "Dr. Smith", "Age": 45 })
   const [formData, setFormData] = useState({});
+  const [otherTextData, setOtherTextData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -73,6 +73,32 @@ export default function NewSubmission() {
     setSuccessMessage('');
     setError('');
 
+    // Format data before sending
+    const formattedData = { ...formData };
+
+    fields.forEach(field => {
+      const value = formattedData[field.fieldLabel];
+      const customText = otherTextData[field.fieldLabel];
+
+      if (
+        field.inputType === 'DROPDOWN' &&
+        value === 'Other' &&
+        customText
+      ) {
+        formattedData[field.fieldLabel] = `Other: ${customText}`;
+      } 
+      else if (
+        field.inputType === 'MULTI_SELECT' &&
+        Array.isArray(value) &&
+        value.includes('Other') &&
+        customText
+      ) {
+        formattedData[field.fieldLabel] = value.map(item =>
+          item === 'Other' ? `Other: ${customText}` : item
+        );
+      }
+    });
+
     try {
       const res = await fetch('/api/submissions', {
         method: 'POST',
@@ -82,20 +108,25 @@ export default function NewSubmission() {
         },
         body: JSON.stringify({
           formType: user.role,
-          submissionData: formData
+          submissionData: formattedData
         })
       });
-      
+
       const data = await res.json();
 
       if (res.ok) {
         setSuccessMessage('Data successfully submitted!');
-        // Reset the form values
+
+        // Reset form
         const resetData = {};
-        fields.forEach(f => resetData[f.fieldLabel] = f.inputType === 'MULTI_SELECT' ? [] : '');
+        fields.forEach(field => {
+          resetData[field.fieldLabel] =
+            field.inputType === 'MULTI_SELECT' ? [] : '';
+        });
+
         setFormData(resetData);
-        
-        // Hide success message after 3 seconds
+        setOtherTextData({});
+
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
         setError(data.message);
@@ -133,12 +164,26 @@ export default function NewSubmission() {
 
       case 'DROPDOWN':
         return (
-          <select required={field.isRequired} className={commonClasses} value={value || ''} onChange={(e) => handleInputChange(field.fieldLabel, e.target.value)}>
-            <option value="" disabled>Select an option...</option>
-            {field.options?.map(opt => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </select>
+          <div className="space-y-2">
+            <select required={field.isRequired} className={commonClasses} value={value || ''} onChange={(e) => handleInputChange(field.fieldLabel, e.target.value)}>
+              <option value="" disabled>Select an option...</option>
+              {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {/* Inject Other */}
+              {field.allowOther && <option value="Other">Other</option>}
+            </select>
+            
+            {/* Show text box if Other is selected */}
+            {field.allowOther && value === 'Other' && (
+              <input 
+                type="text" 
+                required 
+                placeholder="Please specify..."
+                value={otherTextData[field.fieldLabel] || ''} 
+                onChange={(e) => setOtherTextData(prev => ({...prev, [field.fieldLabel]: e.target.value}))}
+                className="w-full p-2.5 bg-blue-50 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm mt-2" 
+              />
+            )}
+          </div>
         );
 
       case 'MULTI_SELECT':
@@ -146,15 +191,32 @@ export default function NewSubmission() {
           <div className="space-y-2 p-2">
             {field.options?.map(opt => (
               <label key={opt} className="flex items-center space-x-3 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-                  checked={(value || []).includes(opt)}
-                  onChange={(e) => handleCheckboxChange(field.fieldLabel, opt, e.target.checked)}
-                />
+                <input type="checkbox" className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" checked={(value || []).includes(opt)} onChange={(e) => handleCheckboxChange(field.fieldLabel, opt, e.target.checked)} />
                 <span className="text-slate-700">{opt}</span>
               </label>
             ))}
+            {/* Inject Other Checkbox */}
+            {field.allowOther && (
+              <div className="space-y-2">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input type="checkbox" className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" checked={(value || []).includes('Other')} onChange={(e) => handleCheckboxChange(field.fieldLabel, 'Other', e.target.checked)} />
+                  <span className="text-slate-700 italic">Other</span>
+                </label>
+                
+                {/* Show text box if Other is checked */}
+                {(value || []).includes('Other') && (
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Please specify..."
+                    value={otherTextData[field.fieldLabel] || ''} 
+                    onChange={(e) => setOtherTextData(prev => ({...prev, [field.fieldLabel]: e.target.value}))}
+                    className="w-full p-2.5 bg-blue-50 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm ml-8" 
+                    style={{ width: 'calc(100% - 2rem)' }}
+                  />
+                )}
+              </div>
+            )}
           </div>
         );
 

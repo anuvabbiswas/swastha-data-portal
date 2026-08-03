@@ -66,7 +66,7 @@ export default function FieldManagement() {
   const [error, setError] = useState('');
 
   // New Field Form State
-  const [formData, setFormData] = useState({ fieldLabel: '', inputType: 'TEXT', isRequired: false, optionsString: '' });
+  const [formData, setFormData] = useState({ fieldLabel: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
   // Setup DnD Sensors
@@ -105,7 +105,7 @@ export default function FieldManagement() {
       const res = await fetch('/api/fields', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ ...formData, formType: activeFormType, options: parsedOptions })
+        body: JSON.stringify({ ...formData, formType: activeFormType, options: parsedOptions, allowOther: formData.allowOther })
       });
       if (res.ok) {
         setFormMessage({ type: 'success', text: 'Field added successfully!' });
@@ -188,9 +188,25 @@ export default function FieldManagement() {
                </select>
              </div>
              {['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType) && (
-               <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                 <label className="block text-sm font-medium text-blue-900 mb-1">Choices (Comma Separated)</label>
-                 <input type="text" required value={formData.optionsString} onChange={(e) => setFormData({...formData, optionsString: e.target.value})} className="w-full p-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500" />
+               <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg space-y-3">
+                 <div>
+                   <label className="block text-sm font-medium text-blue-900 mb-1">Choices (Comma Separated)</label>
+                   <input type="text" required value={formData.optionsString} onChange={(e) => setFormData({...formData, optionsString: e.target.value})} className="w-full p-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                 </div>
+                 
+                 {/* --- NEW: Allow Other Checkbox --- */}
+                 <div className="flex items-center space-x-2 border-t border-blue-200 pt-2">
+                   <input 
+                     type="checkbox" 
+                     id="allowOther" 
+                     checked={formData.allowOther} 
+                     onChange={(e) => setFormData({...formData, allowOther: e.target.checked})} 
+                     className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" 
+                   />
+                   <label htmlFor="allowOther" className="text-sm font-medium text-blue-900">
+                     Include an "Other" option with text input
+                   </label>
+                 </div>
                </div>
              )}
              <div className="flex items-center space-x-2 pt-2">
@@ -204,7 +220,7 @@ export default function FieldManagement() {
         {/* Right Side: Current Fields List (With DnD) */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-800">Current Form Layout</h3>
+            <h3 className="text-lg font-semibold text-slate-800">Current Form Layout of {activeFormType.toUpperCase()}</h3>
             <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium">{fields.length} Active Fields</span>
           </div>
           

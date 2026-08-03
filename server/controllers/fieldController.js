@@ -23,14 +23,12 @@ exports.getFields = async (req, res) => {
 // Create a new field definition
 exports.createField = async (req, res) => {
   try {
-    const { formType, fieldLabel, inputType, isRequired, options, displayOrder } = req.body;
+    const { formType, fieldLabel, inputType, isRequired, options, displayOrder, allowOther } = req.body;
 
-    // Validation
     if (!formType || !fieldLabel || !inputType) {
       return res.status(400).json({ status: 'fail', message: 'Missing required field properties.' });
     }
 
-    // Determine the display order if not provided
     let order = displayOrder;
     if (order === undefined) {
       const lastField = await prisma.fieldDefinition.findFirst({
@@ -46,8 +44,9 @@ exports.createField = async (req, res) => {
         fieldLabel,
         inputType,
         isRequired: isRequired || false,
-        options: options || null, // Options will be an array like ["Yes", "No"] for Dropdowns
-        displayOrder: order
+        options: options || null,
+        displayOrder: order,
+        allowOther: allowOther || false 
       }
     });
 

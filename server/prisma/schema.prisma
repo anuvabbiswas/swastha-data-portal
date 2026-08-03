@@ -67,6 +67,7 @@ model FieldDefinition {
   isActive     Boolean   @default(true) // Instead of deleting fields, we "soft delete" them by making them inactive
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  allowOther   Boolean   @default(false)
 }
 
 // 3. Submissions Table

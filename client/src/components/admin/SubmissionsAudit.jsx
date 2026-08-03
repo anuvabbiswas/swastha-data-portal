@@ -252,7 +252,7 @@ export default function SubmissionsAudit() {
       {/* --- NEW: Optimistic Undo Toast Notification --- */}
       {pendingDeletion && (
         <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-4 z-50 animate-in fade-in slide-in-from-bottom-5">
-          <span className="text-sm font-medium">Submission queued for deletion.</span>
+          <span className="text-sm font-medium">Deleting in 3 seconds...</span>
           <button 
             onClick={handleUndo}
             className="flex items-center px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-bold text-blue-400 transition-colors"
