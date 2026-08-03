@@ -4,7 +4,7 @@ import { Lock, Power, Search, Filter, XCircle, Edit3 } from 'lucide-react';
 import EditUserModal from './EditUserModal';
 
 export default function UserManagement() {
-  const { token } = useAuth();
+  const { token, user: loggedInUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -60,8 +60,8 @@ export default function UserManagement() {
     }
   };
 
-  const handleToggleStatus = async (userId, currentStatus, role) => {
-    if (role === 'ADMIN') return alert('Cannot disable an Admin account.');
+  const handleToggleStatus = async (userId, currentStatus) => {
+
     const confirmMessage = currentStatus === 'ACTIVE' 
       ? 'Are you sure you want to disable this user? They will not be able to log in.' 
       : 'Are you sure you want to re-enable this user?';
@@ -73,8 +73,13 @@ export default function UserManagement() {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) fetchUsers(); 
-      else alert('Failed to update status.');
+      
+      if (res.ok) {
+        fetchUsers(); 
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to update status.');
+      }
     } catch (err) {
       alert('Network error occurred.');
     }
@@ -261,35 +266,37 @@ export default function UserManagement() {
                           </span>
                         </td>
                         <td className="p-4 text-right space-x-2">
-                          {u.role !== 'ADMIN' && (
-                            <>
-                              {/* Edit Button */}
-                              <button 
-                                onClick={() => setEditingUser(u)}
-                                className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                title="Edit User"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              <button 
-                                onClick={() => handleResetPassword(u.id)}
-                                className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                title="Reset Password"
-                              >
-                                <Lock className="w-4 h-4" />
-                              </button>
-                              <button 
-                                onClick={() => handleToggleStatus(u.id, u.status, u.role)}
-                                className={`inline-flex items-center p-1.5 rounded transition-colors ${
-                                  u.status === 'ACTIVE' 
-                                    ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' 
-                                    : 'text-red-500 hover:text-green-600 hover:bg-green-50'
-                                }`}
-                                title={u.status === 'ACTIVE' ? "Disable User" : "Enable User"}
-                              >
-                                <Power className="w-4 h-4" />
-                              </button>
-                            </>
+                          {/* 1. Edit Button (Available for everyone) */}
+                          <button 
+                            onClick={() => setEditingUser(u)}
+                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title={u.id === loggedInUser.id ? "Edit My Profile" : "Edit User"}
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          
+                          {/* 2. Reset Password Button (Available for everyone) */}
+                          <button 
+                            onClick={() => handleResetPassword(u.id)}
+                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="Reset Password"
+                          >
+                            <Lock className="w-4 h-4" />
+                          </button>
+
+                          {/* 3. Disable Button (Hidden ONLY if it's the logged-in Admin's row) */}
+                          {u.id !== loggedInUser.id && (
+                            <button 
+                              onClick={() => handleToggleStatus(u.id, u.status, u.role)}
+                              className={`inline-flex items-center p-1.5 rounded transition-colors ${
+                                u.status === 'ACTIVE' 
+                                  ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' 
+                                  : 'text-red-500 hover:text-green-600 hover:bg-green-50'
+                              }`}
+                              title={u.status === 'ACTIVE' ? "Disable User" : "Enable User"}
+                            >
+                              <Power className="w-4 h-4" />
+                            </button>
                           )}
                         </td>
                       </tr>
@@ -312,6 +319,7 @@ export default function UserManagement() {
       {editingUser && (
         <EditUserModal 
           user={editingUser} 
+          loggedInUserId={loggedInUser.id}
           onClose={() => setEditingUser(null)} 
           onRefresh={fetchUsers} 
         />

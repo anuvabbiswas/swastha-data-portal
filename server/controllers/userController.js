@@ -43,14 +43,14 @@ exports.createUser = async (req, res) => {
 exports.toggleUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
+    const loggedInUserId = req.user.id; // Extracted from our JWT middleware
     
-    // Find the user first
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return res.status(404).json({ status: 'fail', message: 'User not found.' });
     
-    // Prevent Admins from accidentally disabling themselves or other admins
-    if (user.role === 'ADMIN') {
-      return res.status(403).json({ status: 'fail', message: 'Cannot disable Admin accounts.' });
+    // NEW: Prevent Admin from accidentally disabling their own active session
+    if (user.id === loggedInUserId) {
+      return res.status(403).json({ status: 'fail', message: 'You cannot disable your own active session.' });
     }
 
     const newStatus = user.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
@@ -93,20 +93,20 @@ exports.updateUserDetails = async (req, res) => {
   try {
     const { id } = req.params;
     const { employeeId, name, role } = req.body;
+    const loggedInUserId = req.user.id;
 
-    // Basic validation
     if (!employeeId || !name || !role) {
       return res.status(400).json({ status: 'fail', message: 'All fields are required.' });
     }
 
-    // Prevent Admin from accidentally changing their own role and locking themselves out
     const targetUser = await prisma.user.findUnique({ where: { id } });
     if (!targetUser) {
       return res.status(404).json({ status: 'fail', message: 'User not found.' });
     }
     
-    if (targetUser.role === 'ADMIN' && role !== 'ADMIN') {
-      return res.status(403).json({ status: 'fail', message: 'Cannot demote an Admin account.' });
+    // NEW: If the Admin is editing themselves, they cannot change their own role.
+    if (targetUser.id === loggedInUserId && role !== targetUser.role) {
+      return res.status(403).json({ status: 'fail', message: 'You cannot change your own role to prevent accidental lockouts.' });
     }
 
     const updatedUser = await prisma.user.update({
@@ -117,11 +117,9 @@ exports.updateUserDetails = async (req, res) => {
 
     res.status(200).json({ status: 'success', data: { user: updatedUser } });
   } catch (error) {
-    // Handle Unique Constraint Violation (P2002) if they enter an existing Employee ID
     if (error.code === 'P2002') {
       return res.status(400).json({ status: 'fail', message: 'That Employee ID is already assigned to another user.' });
     }
-    console.error("Update User Error:", error);
     res.status(500).json({ status: 'error', message: 'Failed to update user details.' });
   }
 };

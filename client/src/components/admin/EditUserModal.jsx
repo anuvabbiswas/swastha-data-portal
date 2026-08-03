@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function EditUserModal({ user, onClose, onRefresh }) {
+export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh }) {
   const { token } = useAuth();
   
   // Initialize form data with the existing user values
@@ -82,14 +82,15 @@ export default function EditUserModal({ user, onClose, onRefresh }) {
               <select 
                 value={formData.role} 
                 onChange={(e) => setFormData({...formData, role: e.target.value})} 
-                disabled={user.role === 'ADMIN'} // Prevent changing Admin roles directly here
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-100"
+                // NEW: Only disable if they are editing themselves
+                disabled={user.id === loggedInUserId} 
+                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-100 disabled:text-slate-500"
               >
                 <option value="MARKETING">Marketing Associate</option>
                 <option value="COMMUNITY">Community Outreach Associate</option>
                 <option value="ADMIN">System Admin</option>
               </select>
-              {user.role === 'ADMIN' && <p className="text-xs text-slate-500 mt-1">Admin roles cannot be modified.</p>}
+              {user.id === loggedInUserId && <p className="text-xs text-orange-500 mt-1">You cannot change your own role.</p>}
             </div>
           </form>
         </div>
