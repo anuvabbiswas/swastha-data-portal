@@ -119,3 +119,24 @@ exports.updateSubmission = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to update submission.' });
   }
 };
+
+// 5. Permanently delete a submission (Admin only)
+exports.deleteSubmission = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verify the submission exists
+    const submission = await prisma.submission.findUnique({ where: { id } });
+    if (!submission) {
+      return res.status(404).json({ status: 'fail', message: 'Submission not found.' });
+    }
+
+    // Hard delete from the database
+    await prisma.submission.delete({ where: { id } });
+
+    res.status(200).json({ status: 'success', message: 'Submission permanently deleted.' });
+  } catch (error) {
+    console.error("Delete Submission Error:", error);
+    res.status(500).json({ status: 'error', message: 'Failed to delete submission.' });
+  }
+};

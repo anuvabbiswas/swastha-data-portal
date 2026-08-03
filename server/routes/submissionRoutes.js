@@ -14,5 +14,6 @@ router.patch('/:id', authMiddleware.restrictTo('MARKETING', 'COMMUNITY'), submis
 
 // 3. Admin Routes (Only Admin)
 router.get('/all', authMiddleware.restrictTo('ADMIN'), submissionController.getAllSubmissions);
+router.delete('/:id', authMiddleware.restrictTo('ADMIN'), submissionController.deleteSubmission);
 
 module.exports = router;
