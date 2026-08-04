@@ -32,51 +32,51 @@ export default function SubmissionHistory() {
   }, [fetchHistory]);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    
+    <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 py-6">
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">My Submissions</h2>
-          <p className="text-slate-500 mt-1">Review and modify the data you have collected.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">My Submissions</h2>
+          <p className="text-sm sm:text-base text-slate-500 mt-1">Review and modify the data you have collected.</p>
         </div>
       </div>
 
       {loading ? (
         <div className="text-slate-500 text-center mt-10">Loading history...</div>
       ) : submissions.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 text-center flex flex-col items-center">
+        <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 text-center flex flex-col items-center mx-auto">
           <AlertCircle className="w-10 h-10 text-slate-300 mb-3" />
           <p className="text-slate-500 font-medium">You haven't submitted any forms yet.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {submissions.map((sub) => (
-            <div key={sub.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 relative group">
-              
-              {/* Card Header */}
-              <div className="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
+            
+            <div key={sub.id} className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 relative group">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 border-b border-slate-100 pb-3">
                 <div>
-                  <div className="flex items-center text-slate-600 text-sm font-medium">
-                    <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                    {new Date(sub.submittedAt).toLocaleDateString()} at {new Date(sub.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                  <div className="flex flex-wrap items-center text-slate-600 text-sm font-medium gap-y-1 gap-x-2">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-500 shrink-0" />
+                      {new Date(sub.submittedAt).toLocaleDateString()} at {new Date(sub.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </div>
                     
-                    {/* The Edited Badge requirement */}
                     {sub.isEdited && (
-                      <span className="ml-3 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold tracking-widest uppercase">
+                      <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold tracking-widest uppercase">
                         Edited
                       </span>
                     )}
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3">
-                  <span className="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded font-bold uppercase tracking-wider">
+                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3 mt-1 sm:mt-0">
+                  <span className="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded font-bold uppercase tracking-wider truncate max-w-[120px] sm:max-w-none">
                     {sub.formType}
                   </span>
                   
-                  {/* The Edit Button */}
                   <button 
                     onClick={() => setEditingSubmission(sub)}
-                    className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md"
+                    className="flex items-center shrink-0 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md"
                   >
                     <Edit3 className="w-4 h-4 mr-1.5" />
                     Edit
@@ -84,10 +84,9 @@ export default function SubmissionHistory() {
                 </div>
               </div>
               
-              {/* Data Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-3">
                 {Object.entries(sub.submissionData).map(([question, answer]) => (
-                  <div key={question} className="space-y-0.5">
+                  <div key={question} className="space-y-0.5 break-words">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">{question}</p>
                     <p className="text-sm font-semibold text-slate-800">
                       {Array.isArray(answer) ? (answer.length > 0 ? answer.join(', ') : '—') : (answer || '—')}
@@ -100,7 +99,6 @@ export default function SubmissionHistory() {
         </div>
       )}
 
-      {/* Render the Modal if a submission is selected */}
       {editingSubmission && (
         <EditSubmissionModal 
           submission={editingSubmission} 
