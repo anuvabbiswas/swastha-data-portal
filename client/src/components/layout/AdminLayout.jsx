@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, FileText, Database, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, FileText, Database, LogOut, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Footer from './Footer';
 
@@ -20,6 +20,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'fields', label: 'Field Management', icon: FileText },
     { id: 'audit', label: 'Submissions Audit', icon: Database },
+    { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
   ];
 
   return (
