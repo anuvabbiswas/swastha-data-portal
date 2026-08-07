@@ -27,10 +27,12 @@ exports.createSubmission = async (req, res) => {
     // Step B: Save the data AND the snapshot of the schema simultaneously
     const newSubmission = await prisma.submission.create({
       data: {
-        associateId,
-        formType: formType.toUpperCase(),
+        associateId: req.user.id,
+        associateName: req.user.name,
+        associateEmployeeId: req.user.employeeId,
+        formType: req.user.role,
         submissionData,
-        schemaSnapshot: activeFields // Storing the array of objects directly into the JSON column
+        schemaSnapshot: activeFields
       }
     });
 

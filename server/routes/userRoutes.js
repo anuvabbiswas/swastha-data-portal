@@ -18,8 +18,10 @@ router.route('/')
 // Action Routes
 router.patch('/:id/status', userController.toggleUserStatus);
 router.patch('/:id/reset-password', userController.resetPassword);
+router.patch('/:id/details', userController.updateUserDetails);
 
 // Edit User Details Route
 router.patch('/:id/details', userController.updateUserDetails);
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

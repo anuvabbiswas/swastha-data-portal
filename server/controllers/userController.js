@@ -123,3 +123,31 @@ exports.updateUserDetails = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to update user details.' });
   }
 };
+
+// Permanently Delete User
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const loggedInUserId = req.user.id; 
+
+    // Prevent Admin from deleting their own active session
+    if (id === loggedInUserId) {
+      return res.status(403).json({ status: 'fail', message: 'You cannot permanently delete your own account.' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      return res.status(404).json({ status: 'fail', message: 'User not found.' });
+    }
+
+    // Hard delete the user. (Submissions will remain because of onDelete: SetNull)
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    res.status(200).json({ status: 'success', message: 'User permanently deleted.' });
+  } catch (error) {
+    console.error("Delete User Error:", error);
+    res.status(500).json({ status: 'error', message: 'Failed to delete user.' });
+  }
+};

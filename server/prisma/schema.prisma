@@ -71,24 +71,22 @@ model FieldDefinition {
 }
 
 // 3. Submissions Table
-// Stores the actual data collected in the field.
 model Submission {
-  id          String   @id @default(uuid())
-  associateId String // Foreign Key linking to User
-  formType    FormType
+  id                  String   @id @default(uuid())
+  
+  // 1. Make this optional so the database allows SetNull
+  associateId         String?  
+  // 2. Change onDelete behavior to SetNull
+  associate           User?    @relation(fields: [associateId], references: [id], onDelete: SetNull)
+  
+  // 3. Add Denormalized fields (with defaults for existing rows)
+  associateName       String   @default("Unknown Associate")
+  associateEmployeeId String   @default("UNKNOWN-ID")
 
-  // The actual answers submitted by the associate (Flexible JSON)
-  submissionData Json
-
-  // A snapshot of the exact Field Definitions active at the time of submission.
-  // This solves the "Form Versioning Problem" so old records don't break if Admins change fields later.
-  schemaSnapshot Json
-
-  submittedAt DateTime @default(now()) // Immutable timestamp for audit trails
-
-  isEdited  Boolean  @default(false)
-  updatedAt DateTime @default(now()) @updatedAt
-
-  // Defining the relational link to the User model
-  associate User @relation(fields: [associateId], references: [id])
+  formType            String
+  submissionData      Json
+  schemaSnapshot      Json
+  submittedAt         DateTime @default(now())
+  isEdited            Boolean  @default(false)
+  updatedAt           DateTime @default(now()) @updatedAt
 }
