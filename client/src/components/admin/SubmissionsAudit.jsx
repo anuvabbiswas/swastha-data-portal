@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { Eye, ChevronDown, ChevronUp, Filter, Calendar, XCircle, Download, Trash2, RotateCcw } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function SubmissionsAudit() {
   const { token } = useAuth();
@@ -157,11 +159,111 @@ export default function SubmissionsAudit() {
     }
   };
 
+  // --- NEW: Professional PDF Export ---
+  const handleExportPDF = () => {
+    setShowExportMenu(false);
+    if (filteredSubmissions.length === 0) return alert("No data to export.");
+
+    // 1. Initialize Landscape PDF (better for wide data tables)
+    const doc = new jsPDF('landscape');
+    doc.setProperties({
+      title: 'Submission Audit Report',
+      subject: 'Audit',
+      author: 'Swastha Hospital',
+      creator: 'Swastha Data Collection Portal'
+    });
+    // 2. Fetch the flattened data we already generate for Excel
+    const flatData = generateExportData();
+    if (flatData.length === 0) return;
+
+    const headers = Object.keys(flatData[0]);
+    const data = flatData.map(row => headers.map(h => row[h]));
+
+    // 3. Inject Professional Report Metadata
+    doc.setFontSize(18);
+    doc.setTextColor(30, 41, 59); // slate-800
+    doc.text('Swastha Hospital - Form Submission Report', 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text(`Report Category: ${filterCategory === 'ALL' ? 'All Submissions' : filterCategory}`, 14, 30);
+    doc.text(`Applied Date Filter: ${filterDate || 'None'}`, 14, 36);
+    doc.text(`Generated On: ${new Date().toLocaleString()}`, 14, 42);
+    doc.text(`Total Records: ${filteredSubmissions.length}`, 14, 48);
+    // 4. Generate the Auto-wrapping Table
+    autoTable(doc, {
+      startY: 56,
+      head: [headers],
+      body: data,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 8,
+        cellPadding: 4,
+        overflow: 'linebreak',
+        valign: 'middle'
+      },
+
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+
+      alternateRowStyles: {
+        fillColor: [248, 250, 252]
+      },
+
+      columnStyles: {
+        0: { cellWidth: 40 },   // Submission ID
+        1: { cellWidth: 40 },   // Date
+        2: { cellWidth: 35 },   // Associate
+        3: { cellWidth: 25 },   // Employee ID
+        4: { cellWidth: 25 }    // Category
+      },
+
+      horizontalPageBreak: true,
+      horizontalPageBreakRepeat: [
+        'Submission ID',
+        'Associate Name',
+        'Associate ID'
+      ]
+    });
+
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text(
+        'Swastha Hospital',
+        14,
+        doc.internal.pageSize.getHeight() - 10
+      );
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.getWidth() - 35,
+        doc.internal.pageSize.getHeight() - 10
+      );
+    }
+    
+    doc.setProperties({
+      title: 'Form Submissions Report',
+      subject: 'Audit',
+      author: 'Swastha Hospital',
+      creator: 'Swastha Data Collection Portal'
+    });
+    // 5. Trigger Download
+    const fileName = `Swastha_Report_${filterCategory}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+  };
+
   return (
     <div className="p-8 relative">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Master Submissions Audit</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Form Submissions History</h2>
           <p className="text-slate-500 mt-1">Review, filter, export, and manage field data.</p>
         </div>
         
@@ -173,6 +275,7 @@ export default function SubmissionsAudit() {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-50">
               <button onClick={() => handleExport('excel')} className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-t-lg">Excel (.xlsx)</button>
               <button onClick={() => handleExport('csv')} className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-b-lg border-t border-slate-100">CSV (.csv)</button>
+              <button onClick={handleExportPDF} className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-b-lg border-t border-slate-100">PDF (.pdf)</button>
             </div>
           )}
         </div>
