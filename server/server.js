@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const fieldRoutes = require('./routes/fieldRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/fields', fieldRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Server Initialization
 const PORT = process.env.PORT || 5000;

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `FieldDefinition` MODIFY `inputType` ENUM('TEXT', 'NUMBER', 'DATE', 'DROPDOWN', 'MULTI_SELECT', 'YES_NO', 'UPLOAD_MEDIA') NOT NULL;

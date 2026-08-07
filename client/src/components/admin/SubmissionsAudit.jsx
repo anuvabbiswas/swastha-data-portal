@@ -124,6 +124,22 @@ export default function SubmissionsAudit() {
     });
   };
 
+  // --- NEW: Securely Fetch and View Protected Media ---
+  const handleViewMedia = async (filename) => {
+    try {
+      const res = await fetch(`/api/uploads/${filename}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch file');
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (err) {
+      alert('Error loading media file. It may have been deleted or corrupted.');
+    }
+  };
+
   const handleExport = (format) => {
     setShowExportMenu(false);
     if (filteredSubmissions.length === 0) return alert("No data to export.");
@@ -225,14 +241,30 @@ export default function SubmissionsAudit() {
                           <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-inner">
                             <h4 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Submitted Field Data</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                              {Object.entries(sub.submissionData).map(([question, answer]) => (
-                                <div key={question}>
-                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{question}</p>
-                                  <p className="text-sm text-slate-900 font-medium">
-                                    {Array.isArray(answer) ? answer.join(', ') : (answer || 'N/A')}
-                                  </p>
-                                </div>
-                              ))}
+                              {Object.entries(sub.submissionData).map(([question, answer]) => {
+                                // Cross-reference snapshot to check if it's a media field
+                                const snapshot = typeof sub.schemaSnapshot === 'string' ? JSON.parse(sub.schemaSnapshot) : sub.schemaSnapshot;
+                                const fieldDef = snapshot.find(f => f.fieldLabel === question);
+                                const isMedia = fieldDef?.inputType === 'UPLOAD_MEDIA';
+
+                                return (
+                                  <div key={question}>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{question}</p>
+                                    {isMedia && answer ? (
+                                      <button 
+                                        onClick={() => handleViewMedia(answer)}
+                                        className="text-sm text-blue-600 hover:text-blue-800 font-semibold underline decoration-2 underline-offset-4"
+                                      >
+                                        View Uploaded Document
+                                      </button>
+                                    ) : (
+                                      <p className="text-sm text-slate-900 font-medium">
+                                        {Array.isArray(answer) ? answer.join(', ') : (answer || 'N/A')}
+                                      </p>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         </td>

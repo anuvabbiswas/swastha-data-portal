@@ -34,6 +34,7 @@ enum InputType {
   DROPDOWN
   MULTI_SELECT
   YES_NO
+  UPLOAD_MEDIA
 }
 
 // --- MODELS (TABLES) ---

@@ -12,7 +12,9 @@ export default function NewSubmission() {
   // This state will hold all the dynamic answers! (e.g., { "Doctor Name": "Dr. Smith", "Age": 45 })
   const [formData, setFormData] = useState({});
   const [otherTextData, setOtherTextData] = useState({});
+  const [uploadingFiles, setUploadingFiles] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isUploading = Object.values(uploadingFiles).some(Boolean);
   const [successMessage, setSuccessMessage] = useState('');
 
   // 1. Fetch the correct fields based on the user's role
@@ -66,9 +68,55 @@ export default function NewSubmission() {
     });
   };
 
-  // 4. Submit the dynamic JSON payload to the backend
+  // 4. Secure File Upload Handler
+  const handleFileUpload = async (fieldLabel, file) => {
+    if (!file) return;
+    
+    // Strict Validation
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Validation Error: File size exceeds the 10MB limit.');
+      return;
+    }
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Validation Error: Invalid file type. Only PDF, JPG, and PNG are allowed.');
+      return;
+    }
+
+    // Prepare FormData
+    setUploadingFiles(prev => ({ ...prev, [fieldLabel]: true }));
+    const uploadData = new FormData();
+    uploadData.append('media', file);
+
+    try {
+      // Send securely to backend (Note: Do NOT set Content-Type header for FormData)
+      const res = await fetch('/api/uploads', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: uploadData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        // Save the returned filename string into the form JSON
+        handleInputChange(fieldLabel, data.data.filename);
+      } else {
+        alert(data.message || 'File upload failed.');
+      }
+    } catch (err) {
+      alert('Network error during file upload.');
+    } finally {
+      setUploadingFiles(prev => ({ ...prev, [fieldLabel]: false }));
+    }
+  };
+
+  // 5. Submit the dynamic JSON payload to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isUploading)
+    {
+      return;
+    }
     setIsSubmitting(true);
     setSuccessMessage('');
     setError('');
@@ -138,7 +186,7 @@ export default function NewSubmission() {
     }
   };
 
-  // 5. The Dynamic Renderer Function
+  // 6. The Dynamic Renderer Function
   const renderInput = (field) => {
     const value = formData[field.fieldLabel];
     const commonClasses = "w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
@@ -219,9 +267,25 @@ export default function NewSubmission() {
             )}
           </div>
         );
-
-      default:
-        return null;
+      
+      case 'UPLOAD_MEDIA':
+        return (
+          <div className="space-y-2">
+            <input 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              required={field.isRequired && !value} 
+              onChange={(e) => handleFileUpload(field.fieldLabel, e.target.files[0])}
+              className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={uploadingFiles[field.fieldLabel]}
+            />
+            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-blue-600 font-semibold animate-pulse">Uploading securely...</p>}
+            {value && !uploadingFiles[field.fieldLabel] && (
+              <p className="text-xs text-green-600 font-semibold">✓ File attached successfully.</p>
+            )}
+          </div>
+        );
+      default: return null;
     }
   };
 
@@ -261,10 +325,10 @@ export default function NewSubmission() {
           <div className="pt-4 border-t border-slate-100">
             <button 
               type="submit" 
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading}
               className={`w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-all text-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              {isSubmitting ? 'Saving Data...' : 'Submit Data'}
+              {isUploading ? 'Uploading File...' : isSubmitting ? 'Saving Data...' : 'Submit Data'}
             </button>
           </div>
         </form>

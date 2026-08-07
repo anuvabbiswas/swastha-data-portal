@@ -183,8 +183,14 @@ export default function FieldManagement() {
              <div><label className="block text-sm font-medium text-slate-700 mb-1">Question / Field Label</label><input type="text" required value={formData.fieldLabel} onChange={(e) => setFormData({...formData, fieldLabel: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g. Full Name" /></div>
              <div>
                <label className="block text-sm font-medium text-slate-700 mb-1">Response Type</label>
-               <select value={formData.inputType} onChange={(e) => setFormData({...formData, inputType: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                 <option value="TEXT">Short Text</option><option value="NUMBER">Number</option><option value="DATE">Date</option><option value="YES_NO">Yes / No</option><option value="DROPDOWN">Single Choice (Dropdown)</option><option value="MULTI_SELECT">Multiple Choice (Checkboxes)</option>
+               <select required value={formData.inputType} onChange={(e) => setFormData({...formData, inputType: e.target.value})} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                 <option value="TEXT">Short Text</option>
+                 <option value="NUMBER">Number</option>
+                 <option value="DATE">Date</option>
+                 <option value="YES_NO">Yes / No</option>
+                 <option value="DROPDOWN">Single Choice (Dropdown)</option>
+                 <option value="MULTI_SELECT">Multiple Choice (Checkboxes)</option>
+                 <option value="UPLOAD_MEDIA">Upload Media (PDF/JPG/PNG)</option>
                </select>
              </div>
              {['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType) && (

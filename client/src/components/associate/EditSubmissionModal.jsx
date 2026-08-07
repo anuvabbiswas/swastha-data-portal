@@ -8,8 +8,9 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
   // 1. Initialize State
   const [formData, setFormData] = useState({});
   const [otherTextData, setOtherTextData] = useState({});
-  
+  const [uploadingFiles, setUploadingFiles] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isUploading = Object.values(uploadingFiles).some(Boolean);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -74,6 +75,48 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
         return { ...prev, [fieldLabel]: currentSelections.filter(item => item !== option) };
       }
     });
+  };
+
+  // --- NEW: Secure File Upload Handler ---
+  const handleFileUpload = async (fieldLabel, file) => {
+    if (!file) return;
+    
+    // 1. Strict Validation
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Validation Error: File size exceeds the 10MB limit.');
+      return;
+    }
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Validation Error: Invalid file type. Only PDF, JPG, and PNG are allowed.');
+      return;
+    }
+
+    // 2. Prepare FormData
+    setUploadingFiles(prev => ({ ...prev, [fieldLabel]: true }));
+    const uploadData = new FormData();
+    uploadData.append('media', file);
+
+    try {
+      // 3. Send securely to backend (Note: Do NOT set Content-Type header for FormData)
+      const res = await fetch('/api/uploads', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: uploadData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        // Save the returned filename string into the form JSON
+        handleInputChange(fieldLabel, data.data.filename);
+      } else {
+        alert(data.message || 'File upload failed.');
+      }
+    } catch (err) {
+      alert('Network error during file upload.');
+    } finally {
+      setUploadingFiles(prev => ({ ...prev, [fieldLabel]: false }));
+    }
   };
 
   // 3. Submit the PATCH request
@@ -195,7 +238,24 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
             )}
           </div>
         );
-        
+      
+      case 'UPLOAD_MEDIA':
+        return (
+          <div className="space-y-2">
+            <input 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              required={field.isRequired && !value} 
+              onChange={(e) => handleFileUpload(field.fieldLabel, e.target.files[0])}
+              className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={uploadingFiles[field.fieldLabel]}
+            />
+            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-blue-600 font-semibold animate-pulse">Uploading securely...</p>}
+            {value && !uploadingFiles[field.fieldLabel] && (
+              <p className="text-xs text-green-600 font-semibold">✓ File attached successfully.</p>
+            )}
+          </div>
+        ); 
       default: return null;
     }
   };
@@ -245,10 +305,10 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
           <button 
             type="submit" 
             form="edit-form" 
-            disabled={isSubmitting || success}
+            disabled={isSubmitting || success || isUploading}
             className={`px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
+            {isUploading ? 'Uploading File...' : isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
 
