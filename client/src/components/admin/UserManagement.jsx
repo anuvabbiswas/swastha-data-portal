@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Lock, Power, Search, Filter, XCircle, Edit3 } from 'lucide-react';
 import EditUserModal from './EditUserModal';
+import ResetPasswordModal from './ResetPasswordModal';
 
 export default function UserManagement() {
   const { token, user: loggedInUser } = useAuth();
@@ -18,7 +19,8 @@ export default function UserManagement() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   
   const [editingUser, setEditingUser] = useState(null);
-
+  const [resettingPasswordUser, setResettingPasswordUser] = useState(null);
+  
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -85,22 +87,24 @@ export default function UserManagement() {
     }
   };
 
-  const handleResetPassword = async (userId) => {
-    const newPassword = window.prompt('Enter the new temporary password for this user:');
-    if (!newPassword) return; 
+  // const handleResetPassword = async (userId) => {
+  //   const newPassword = window.prompt('Enter the new temporary password for this user:');
+  //   if (!newPassword) return; 
 
-    try {
-      const res = await fetch(`/api/users/${userId}/reset-password`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ newPassword })
-      });
-      const data = await res.json();
-      alert(data.message);
-    } catch (err) {
-      alert('Network error occurred.');
-    }
-  };
+  //   try {
+  //     const res = await fetch(`/api/users/${userId}/reset-password`, {
+  //       method: 'PATCH',
+  //       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+  //       body: JSON.stringify({ newPassword })
+  //     });
+  //     const data = await res.json();
+  //     alert(data.message);
+  //   } catch (err) {
+  //     alert('Network error occurred.');
+  //   }
+  // };
+
+
 
   // --- NEW: Dynamic Filtering Logic ---
   const filteredUsers = users.filter(user => {
@@ -277,7 +281,7 @@ export default function UserManagement() {
                           
                           {/* 2. Reset Password Button (Available for everyone) */}
                           <button 
-                            onClick={() => handleResetPassword(u.id)}
+                            onClick={() => setResettingPasswordUser(u)}
                             className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="Reset Password"
                           >
@@ -322,6 +326,13 @@ export default function UserManagement() {
           loggedInUserId={loggedInUser.id}
           onClose={() => setEditingUser(null)} 
           onRefresh={fetchUsers} 
+        />
+      )}
+      {/* Edit password modal */}
+      {resettingPasswordUser && (
+        <ResetPasswordModal 
+          user={resettingPasswordUser} 
+          onClose={() => setResettingPasswordUser(null)} 
         />
       )}
     </div>
