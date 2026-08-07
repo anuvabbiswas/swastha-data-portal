@@ -110,8 +110,8 @@ export default function SubmissionsAudit() {
       const row = {
         'Submission ID': sub.id,
         'Date & Time': new Date(sub.submittedAt).toLocaleString(),
-        'Associate Name': sub.associate.name,
-        'Associate ID': sub.associate.employeeId,
+        'Associate Name': sub.associateName,
+        'Associate ID': sub.associateEmployeeId,
         'Form Category': sub.formType,
         'Was Edited?': sub.isEdited ? 'Yes' : 'No',
         'Last Updated': new Date(sub.updatedAt).toLocaleString()
@@ -199,7 +199,7 @@ export default function SubmissionsAudit() {
                         {sub.isEdited && <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">Edited</span>}
                       </td>
                       <td className="p-4 font-medium text-slate-900">
-                        {sub.associate.name} <span className="text-slate-500 font-normal">({sub.associate.employeeId})</span>
+                        {sub.associateName} <span className="text-slate-500 font-normal">({sub.associateEmployeeId})</span>
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${sub.formType === 'MARKETING' ? 'bg-purple-50 text-purple-700' : 'bg-emerald-50 text-emerald-700'}`}>
