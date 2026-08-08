@@ -87,25 +87,6 @@ export default function UserManagement() {
     }
   };
 
-  // const handleResetPassword = async (userId) => {
-  //   const newPassword = window.prompt('Enter the new temporary password for this user:');
-  //   if (!newPassword) return; 
-
-  //   try {
-  //     const res = await fetch(`/api/users/${userId}/reset-password`, {
-  //       method: 'PATCH',
-  //       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-  //       body: JSON.stringify({ newPassword })
-  //     });
-  //     const data = await res.json();
-  //     alert(data.message);
-  //   } catch (err) {
-  //     alert('Network error occurred.');
-  //   }
-  // };
-
-
-
   // --- NEW: Dynamic Filtering Logic ---
   const filteredUsers = users.filter(user => {
     // 1. Search Logic (Case-insensitive)
@@ -146,15 +127,15 @@ export default function UserManagement() {
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
-              <input type="text" required value={formData.employeeId} onChange={(e) => setFormData({...formData, employeeId: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g. MKT-005" />
+              <input type="text" required value={formData.employeeId} onChange={(e) => setFormData({...formData, employeeId: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" placeholder="e.g. MKT-005" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-              <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-              <select required value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select required value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand">
                 <option value="" disabled>Select role</option>
                 <option value="MARKETING">Marketing Associate</option>
                 <option value="COMMUNITY">Community Outreach Associate</option>
@@ -162,10 +143,10 @@ export default function UserManagement() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Temporary Password</label>
-              <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+              <input type="password" required value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" />
             </div>
-            <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700">
+            <button type="submit" className="w-full bg-brand text-white font-semibold py-2 rounded-lg hover:bg-brand-hover">
               Create Account
             </button>
           </form>
@@ -188,7 +169,7 @@ export default function UserManagement() {
                 placeholder="Search by Name or ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full pl-10 p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm"
               />
             </div>
 
@@ -197,7 +178,7 @@ export default function UserManagement() {
               <select 
                 value={roleFilter} 
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-slate-700"
+                className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm text-slate-700"
               >
                 <option value="ALL">All Roles</option>
                 <option value="ADMIN">Admin</option>
@@ -211,7 +192,7 @@ export default function UserManagement() {
               <select 
                 value={statusFilter} 
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-slate-700"
+                className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm text-slate-700"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="ACTIVE">Active</option>
@@ -260,7 +241,7 @@ export default function UserManagement() {
                         <td className="p-4 font-medium text-slate-900">{u.employeeId}</td>
                         <td className="p-4 text-slate-700">{u.name}</td>
                         <td className="p-4">
-                          <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-semibold">
+                          <span className="px-2 py-1 bg-brand/10 text-brand-hover rounded text-xs font-semibold">
                             {u.role.replace('_', ' ')}
                           </span>
                         </td>
@@ -273,7 +254,7 @@ export default function UserManagement() {
                           {/* 1. Edit Button (Available for everyone) */}
                           <button 
                             onClick={() => setEditingUser(u)}
-                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-brand hover:bg-brand/10 rounded transition-colors"
                             title={u.id === loggedInUser.id ? "Edit My Profile" : "Edit User"}
                           >
                             <Edit3 className="w-4 h-4" />
@@ -282,7 +263,7 @@ export default function UserManagement() {
                           {/* 2. Reset Password Button (Available for everyone) */}
                           <button 
                             onClick={() => setResettingPasswordUser(u)}
-                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="inline-flex items-center p-1.5 text-slate-400 hover:text-brand hover:bg-brand/10 rounded transition-colors"
                             title="Reset Password"
                           >
                             <Lock className="w-4 h-4" />

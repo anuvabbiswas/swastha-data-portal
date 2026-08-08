@@ -61,12 +61,12 @@ export default function Analytics() {
       {/* 1. Header & Category Toggle */}
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Analytics Dashboard</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Analytics</h2>
           <p className="text-slate-500 mt-1">Visualize data distributions and trends.</p>
         </div>
         <div className="flex bg-slate-200 p-1 rounded-lg shadow-inner">
-          <button onClick={() => { setCategory('MARKETING'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'MARKETING' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing</button>
-          <button onClick={() => { setCategory('COMMUNITY'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'COMMUNITY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community</button>
+          <button onClick={() => { setCategory('MARKETING'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing</button>
+          <button onClick={() => { setCategory('COMMUNITY'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community</button>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export default function Analytics() {
               {loading ? '...' : data.totalSubmissions}
             </h3>
           </div>
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+          <div className="p-3 bg-brand/10 text-brand rounded-lg">
             <BarChart3 className="w-6 h-6" />
           </div>
         </div>

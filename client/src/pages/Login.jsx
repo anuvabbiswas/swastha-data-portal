@@ -79,7 +79,7 @@ export default function Login() {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none"
+                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand appearance-none"
                 required
               >
                 <option value="" disabled>Choose your role...</option>
@@ -96,7 +96,7 @@ export default function Login() {
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 placeholder="e.g. ADM-001"
-                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand"
                 required
               />
             </div>
@@ -109,7 +109,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 pr-12"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand pr-12"
                   required
                 />
                 <button
@@ -131,7 +131,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full py-2.5 bg-brand hover:bg-brand-hover text-white font-semibold rounded-lg shadow-sm transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {isSubmitting ? 'Authenticating...' : 'Login'}
               </button>

@@ -57,7 +57,7 @@ export default function SubmissionHistory() {
                 <div>
                   <div className="flex flex-wrap items-center text-slate-600 text-sm font-medium gap-y-1 gap-x-2">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-blue-500 shrink-0" />
+                      <Calendar className="w-4 h-4 mr-2 text-brand shrink-0" />
                       {new Date(sub.submittedAt).toLocaleDateString()} at {new Date(sub.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </div>
                     
@@ -76,7 +76,7 @@ export default function SubmissionHistory() {
                   
                   <button 
                     onClick={() => setEditingSubmission(sub)}
-                    className="flex items-center shrink-0 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md"
+                    className="flex items-center shrink-0 text-sm font-medium text-brand hover:text-brand-hover transition-colors bg-brand/10 hover:bg-brand/20 px-3 py-1.5 rounded-md"
                   >
                     <Edit3 className="w-4 h-4 mr-1.5" />
                     Edit

@@ -76,7 +76,7 @@ export default function ResetPasswordModal({ user, onClose }) {
         <div className="flex justify-between items-center p-6 border-b border-slate-100">
           <div>
             <h2 className="text-xl font-bold text-slate-800">Reset Password</h2>
-            <p className="text-xs text-slate-500 mt-1">For Associate: {user.name} ({user.employeeId})</p>
+            <p className="text-xs text-slate-500 mt-1">For: {user.name} ({user.employeeId})</p>
           </div>
           <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
             <X className="w-5 h-5" />
@@ -103,7 +103,7 @@ export default function ResetPasswordModal({ user, onClose }) {
                       autoFocus
                       value={newPassword} 
                       onChange={(e) => setNewPassword(e.target.value)} 
-                      className="w-full p-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" 
+                      className="w-full p-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-brand text-sm" 
                       placeholder="Type new password..."
                     />
                     <button 
@@ -126,7 +126,7 @@ export default function ResetPasswordModal({ user, onClose }) {
                       value={confirmPassword} 
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                      className="w-full p-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" 
+                      className="w-full p-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-brand text-sm" 
                       placeholder="Re-type new password..."
                     />
                     <button 
@@ -153,7 +153,7 @@ export default function ResetPasswordModal({ user, onClose }) {
                 <button 
                   type="button" 
                   onClick={handleNext}
-                  className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors"
                 >
                   Next
                 </button>
@@ -167,7 +167,7 @@ export default function ResetPasswordModal({ user, onClose }) {
                   type="button" 
                   onClick={handleSubmit} 
                   disabled={isSubmitting}
-                  className={`px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
                   {isSubmitting ? 'Confirming...' : 'Confirm'}
                 </button>

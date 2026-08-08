@@ -16,7 +16,7 @@ function SortableFieldItem({ field, index, onDeactivate }) {
   };
 
   return (
-    <li ref={setNodeRef} style={style} className={`p-4 bg-white border-b border-slate-100 flex items-center justify-between group transition-colors ${isDragging ? 'shadow-lg ring-2 ring-blue-500 rounded-lg relative' : 'hover:bg-slate-50'}`}>
+    <li ref={setNodeRef} style={style} className={`p-4 bg-white border-b border-slate-100 flex items-center justify-between group transition-colors ${isDragging ? 'shadow-lg ring-2 ring-brand rounded-lg relative' : 'hover:bg-slate-50'}`}>
       <div className="flex items-center space-x-4">
         {/* Drag Handle */}
         <div {...attributes} {...listeners} className="cursor-grab hover:bg-slate-100 p-1 rounded active:cursor-grabbing text-slate-400">
@@ -32,7 +32,7 @@ function SortableFieldItem({ field, index, onDeactivate }) {
             {field.isRequired && <span className="ml-2 text-red-500 text-xs font-bold" title="Required">*</span>}
           </h4>
           <div className="flex items-center space-x-2 mt-1">
-            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold tracking-wider uppercase">
+            <span className="px-2 py-0.5 bg-brand/10 text-brand-hover rounded text-[10px] font-bold tracking-wider uppercase">
               {field.inputType.replace('_', ' ')}
             </span>
             {field.options && Array.isArray(field.options) && (
@@ -165,12 +165,12 @@ export default function FieldManagement() {
     <div className="p-8">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Field Management</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Form Management</h2>
           <p className="text-slate-500 mt-1">Configure and set form fields.</p>
         </div>
         <div className="flex bg-slate-200 p-1 rounded-lg">
-          <button onClick={() => setActiveFormType('MARKETING')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'MARKETING' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing Form</button>
-          <button onClick={() => setActiveFormType('COMMUNITY')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'COMMUNITY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community Form</button>
+          <button onClick={() => setActiveFormType('MARKETING')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing Form</button>
+          <button onClick={() => setActiveFormType('COMMUNITY')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community Form</button>
         </div>
       </div>
 
@@ -180,10 +180,10 @@ export default function FieldManagement() {
            <h3 className="text-lg font-semibold text-slate-800 mb-4">Add question to {activeFormType.toUpperCase()}</h3>
            {formMessage.text && <div className={`mb-4 p-3 rounded text-sm font-medium ${formMessage.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{formMessage.text}</div>}
            <form onSubmit={handleCreateField} className="space-y-4">
-             <div><label className="block text-sm font-medium text-slate-700 mb-1">Question / Field Label</label><input type="text" required value={formData.fieldLabel} onChange={(e) => setFormData({...formData, fieldLabel: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="e.g. Full Name" /></div>
+             <div><label className="block text-sm font-medium text-slate-700 mb-1">Question / Field Label</label><input type="text" required value={formData.fieldLabel} onChange={(e) => setFormData({...formData, fieldLabel: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" placeholder="e.g. Full Name" /></div>
              <div>
                <label className="block text-sm font-medium text-slate-700 mb-1">Response Type</label>
-               <select required value={formData.inputType} onChange={(e) => setFormData({...formData, inputType: e.target.value})} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+               <select required value={formData.inputType} onChange={(e) => setFormData({...formData, inputType: e.target.value})} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm">
                  <option value="TEXT">Short Text</option>
                  <option value="NUMBER">Number</option>
                  <option value="DATE">Date</option>
@@ -194,32 +194,32 @@ export default function FieldManagement() {
                </select>
              </div>
              {['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType) && (
-               <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg space-y-3">
+               <div className="p-3 bg-brand/10 border border-brand/20 rounded-lg space-y-3">
                  <div>
-                   <label className="block text-sm font-medium text-blue-900 mb-1">Choices (Comma Separated)</label>
-                   <input type="text" required value={formData.optionsString} onChange={(e) => setFormData({...formData, optionsString: e.target.value})} className="w-full p-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                   <label className="block text-sm font-medium text-brand-hover mb-1">Choices (Comma Separated)</label>
+                   <input type="text" required value={formData.optionsString} onChange={(e) => setFormData({...formData, optionsString: e.target.value})} className="w-full p-2 border border-brand/30 rounded-lg focus:ring-2 focus:ring-brand" />
                  </div>
                  
                  {/* --- NEW: Allow Other Checkbox --- */}
-                 <div className="flex items-center space-x-2 border-t border-blue-200 pt-2">
+                 <div className="flex items-center space-x-2 border-t border-brand/30 pt-2">
                    <input 
                      type="checkbox" 
                      id="allowOther" 
                      checked={formData.allowOther} 
                      onChange={(e) => setFormData({...formData, allowOther: e.target.checked})} 
-                     className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" 
+                     className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand" 
                    />
-                   <label htmlFor="allowOther" className="text-sm font-medium text-blue-900">
+                   <label htmlFor="allowOther" className="text-sm font-medium text-brand-hover">
                      Include an "Other" option with text input
                    </label>
                  </div>
                </div>
              )}
              <div className="flex items-center space-x-2 pt-2">
-               <input type="checkbox" id="isRequired" checked={formData.isRequired} onChange={(e) => setFormData({...formData, isRequired: e.target.checked})} className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" />
+               <input type="checkbox" id="isRequired" checked={formData.isRequired} onChange={(e) => setFormData({...formData, isRequired: e.target.checked})} className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand" />
                <label htmlFor="isRequired" className="text-sm font-medium text-slate-700">Make this question required</label>
              </div>
-             <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 mt-2">Add Field to Form</button>
+             <button type="submit" className="w-full bg-brand text-white font-semibold py-2 rounded-lg hover:bg-brand-hover mt-2">Add Field to Form</button>
            </form>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, FileText, Database, LogOut, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
+import { Users, FileText, FileClock, LogOut, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Footer from './Footer';
 
@@ -18,21 +18,21 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
 
   const navItems = [
     { id: 'users', label: 'User Management', icon: Users },
-    { id: 'fields', label: 'Field Management', icon: FileText },
-    { id: 'audit', label: 'Submissions Audit', icon: Database },
-    { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
+    { id: 'fields', label: 'Form Management', icon: FileText },
+    { id: 'audit', label: 'Submissions History', icon: FileClock },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex overflow-hidden">
       
       {/* Sidebar with dynamic width and smooth transitions */}
-      <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-slate-900 text-white flex flex-col transition-all duration-300 relative z-20`}>
+      <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-sidebar text-white flex flex-col transition-all duration-300 relative z-20`}>
         
         {/* Collapse/Expand Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-8 bg-blue-600 text-white rounded-full p-1 border-2 border-slate-50 hover:bg-blue-700 transition-colors shadow-sm"
+          className="absolute -right-3 top-8 bg-brand text-white rounded-full p-1 border-2 border-slate-50 hover:bg-brand-hover transition-colors shadow-sm"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -41,7 +41,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
         {/* Sidebar Header */}
         <div className={`p-6 border-b border-slate-800 transition-all duration-300 ${isCollapsed ? 'text-center px-2' : ''}`}>
           <h1 className={`font-bold transition-all whitespace-nowrap overflow-hidden ${isCollapsed ? 'text-sm' : 'text-xl'}`}>
-            {isCollapsed ? 'ADM' : 'Swastha Admin'}
+            {isCollapsed ? 'ADM' : 'Admin'}
           </h1>
           {!isCollapsed && <p className="text-sm text-slate-400 mt-1 truncate">ID: {user?.employeeId}</p>}
         </div>
@@ -57,7 +57,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
                 title={isCollapsed ? item.label : ''} // Show tooltip if collapsed
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'space-x-3 px-4'} py-3 rounded-lg transition-colors ${
                   activeTab === item.id 
-                    ? 'bg-blue-600 text-white shadow-sm' 
+                    ? 'bg-brand text-white shadow-sm' 
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >

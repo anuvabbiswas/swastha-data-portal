@@ -206,7 +206,7 @@ export default function SubmissionsAudit() {
       },
 
       headStyles: {
-        fillColor: [37, 99, 235],
+        fillColor: [15, 118, 110],
         textColor: 255,
         fontStyle: 'bold'
       },
@@ -263,12 +263,12 @@ export default function SubmissionsAudit() {
     <div className="p-8 relative">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Form Submissions History</h2>
-          <p className="text-slate-500 mt-1">Review, filter, export, and manage field data.</p>
+          <h2 className="text-2xl font-bold text-slate-800">Submissions History</h2>
+          <p className="text-slate-500 mt-1">Review, filter, export, and manage form data.</p>
         </div>
         
         <div className="relative">
-          <button onClick={() => setShowExportMenu(!showExportMenu)} className="flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-colors text-sm">
+          <button onClick={() => setShowExportMenu(!showExportMenu)} className="flex items-center px-4 py-2.5 bg-brand hover:bg-brand-hover text-white font-semibold rounded-lg shadow-sm transition-colors text-sm">
             <Download className="w-4 h-4 mr-2" /> Export Data
           </button>
           {showExportMenu && (
@@ -328,7 +328,7 @@ export default function SubmissionsAudit() {
                       <td className="p-4 text-right space-x-2">
                         <button onClick={() => toggleRow(sub.id)} className="inline-flex items-center space-x-1 px-3 py-1.5 bg-white border border-slate-300 rounded text-slate-700 hover:bg-slate-50 text-xs font-semibold">
                           <Eye className="w-4 h-4" />
-                          <span>Data</span>
+                          <span>View</span>
                         </button>
                         
                         {/* --- NEW: Delete Button --- */}
@@ -342,7 +342,7 @@ export default function SubmissionsAudit() {
                       <tr className="bg-slate-50">
                         <td colSpan="4" className="p-6 border-b border-slate-200">
                           <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-inner">
-                            <h4 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Submitted Field Data</h4>
+                            <h4 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Submitted Form Data</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                               {Object.entries(sub.submissionData).map(([question, answer]) => {
                                 // Cross-reference snapshot to check if it's a media field
@@ -356,7 +356,7 @@ export default function SubmissionsAudit() {
                                     {isMedia && answer ? (
                                       <button 
                                         onClick={() => handleViewMedia(answer)}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-semibold underline decoration-2 underline-offset-4"
+                                        className="text-sm text-brand hover:text-brand-hover font-semibold underline decoration-2 underline-offset-4"
                                       >
                                         View Uploaded Document
                                       </button>
@@ -390,7 +390,7 @@ export default function SubmissionsAudit() {
           <span className="text-sm font-medium">Deleting in 3 seconds...</span>
           <button 
             onClick={handleUndo}
-            className="flex items-center px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-bold text-blue-400 transition-colors"
+            className="flex items-center px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-bold text-teal-400 transition-colors"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Undo

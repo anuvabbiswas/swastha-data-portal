@@ -109,11 +109,11 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
           <form id="edit-user-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
-              <input type="text" required value={formData.employeeId} onChange={(e) => setFormData({...formData, employeeId: e.target.value})} className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" required value={formData.employeeId} onChange={(e) => setFormData({...formData, employeeId: e.target.value})} className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-brand text-sm" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-              <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-brand text-sm" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
@@ -121,7 +121,7 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
                 value={formData.role} 
                 onChange={(e) => setFormData({...formData, role: e.target.value})} 
                 disabled={user.id === loggedInUserId} 
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-100 disabled:text-slate-500"
+                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-brand text-sm disabled:bg-slate-100 disabled:text-slate-500"
               >
                 <option value="MARKETING">Marketing Associate</option>
                 <option value="COMMUNITY">Community Outreach Associate</option>
@@ -157,7 +157,7 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
               type="submit" 
               form="edit-user-form" 
               disabled={isSubmitting || success}
-              className={`px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>

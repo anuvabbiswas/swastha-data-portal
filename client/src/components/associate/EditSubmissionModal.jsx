@@ -171,7 +171,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
   // 4. The Dynamic Renderer
   const renderInput = (field) => {
     const value = formData[field.fieldLabel];
-    const commonClasses = "w-full p-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm";
+    const commonClasses = "w-full p-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm";
 
     switch (field.inputType) {
       case 'TEXT': return <input type="text" required={field.isRequired} className={commonClasses} value={value || ''} onChange={(e) => handleInputChange(field.fieldLabel, e.target.value)} />;
@@ -201,7 +201,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
                 placeholder="Please specify..."
                 value={otherTextData[field.fieldLabel] || ''} 
                 onChange={(e) => setOtherTextData(prev => ({...prev, [field.fieldLabel]: e.target.value}))}
-                className="w-full p-2.5 bg-blue-50 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm mt-2" 
+                className="w-full p-2.5 bg-brand/10 border border-brand/30 rounded-lg focus:ring-2 focus:ring-brand text-sm mt-2" 
               />
             )}
           </div>
@@ -212,7 +212,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
           <div className="space-y-2 p-2">
             {field.options?.map(opt => (
               <label key={opt} className="flex items-center space-x-3 cursor-pointer text-sm">
-                <input type="checkbox" className="w-4 h-4 text-blue-600 rounded border-slate-300" checked={(value || []).includes(opt)} onChange={(e) => handleCheckboxChange(field.fieldLabel, opt, e.target.checked)} />
+                <input type="checkbox" className="w-4 h-4 text-brand rounded border-slate-300" checked={(value || []).includes(opt)} onChange={(e) => handleCheckboxChange(field.fieldLabel, opt, e.target.checked)} />
                 <span className="text-slate-700">{opt}</span>
               </label>
             ))}
@@ -220,7 +220,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
             {field.allowOther && (
               <div className="space-y-2">
                 <label className="flex items-center space-x-3 cursor-pointer text-sm">
-                  <input type="checkbox" className="w-4 h-4 text-blue-600 rounded border-slate-300" checked={(value || []).includes('Other')} onChange={(e) => handleCheckboxChange(field.fieldLabel, 'Other', e.target.checked)} />
+                  <input type="checkbox" className="w-4 h-4 text-brand rounded border-slate-300" checked={(value || []).includes('Other')} onChange={(e) => handleCheckboxChange(field.fieldLabel, 'Other', e.target.checked)} />
                   <span className="text-slate-700 italic">Other</span>
                 </label>
                 {(value || []).includes('Other') && (
@@ -230,7 +230,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
                     placeholder="Please specify..."
                     value={otherTextData[field.fieldLabel] || ''} 
                     onChange={(e) => setOtherTextData(prev => ({...prev, [field.fieldLabel]: e.target.value}))}
-                    className="w-full p-2.5 bg-blue-50 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm ml-7" 
+                    className="w-full p-2.5 bg-brand/10 border border-brand/30 rounded-lg focus:ring-2 focus:ring-brand text-sm ml-7" 
                     style={{ width: 'calc(100% - 1.75rem)' }}
                   />
                 )}
@@ -247,10 +247,10 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
               accept=".pdf,.jpg,.jpeg,.png"
               required={field.isRequired && !value} 
               onChange={(e) => handleFileUpload(field.fieldLabel, e.target.files[0])}
-              className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand-hover hover:file:bg-brand/20 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={uploadingFiles[field.fieldLabel]}
             />
-            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-blue-600 font-semibold animate-pulse">Uploading securely...</p>}
+            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-brand font-semibold animate-pulse">Uploading securely...</p>}
             {value && !uploadingFiles[field.fieldLabel] && (
               <p className="text-xs text-green-600 font-semibold">✓ File attached successfully.</p>
             )}
@@ -306,7 +306,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
             type="submit" 
             form="edit-form" 
             disabled={isSubmitting || success || isUploading}
-            className={`px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isUploading ? 'Uploading File...' : isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>

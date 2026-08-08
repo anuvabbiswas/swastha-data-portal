@@ -18,6 +18,10 @@
 
 @theme {
   --font-sans: 'Noto Sans', system-ui, -apple-system, sans-serif;
+
+  --color-sidebar: #0F2D2E;
+  --color-brand: #0D9488;
+  --color-brand-hover: #0F766E;
 }
 
 body {

@@ -19,9 +19,9 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       
       {/* Mobile Header */}
-      <div className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-20">
+      <div className="md:hidden bg-sidebar text-white p-4 flex justify-between items-center z-20">
         <div>
-          <h1 className="text-lg font-bold">Swastha {formattedRole}</h1>
+          <h1 className="text-lg font-bold">{formattedRole} Outreach</h1>
           <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
             <span>{user?.name}</span>
             <span className="text-[10px] text-slate-600">|</span>
@@ -37,10 +37,10 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
       <aside className={`
         fixed md:static inset-y-0 left-0 transform ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0 transition-transform duration-200 ease-in-out z-10 
-        w-64 bg-slate-900 text-white flex flex-col h-full md:min-h-screen
+        w-64 bg-sidebar text-white flex flex-col h-full md:min-h-screen
       `}>
         <div className="p-6 border-b border-slate-800 hidden md:block">
-          <h1 className="text-xl font-bold">Swastha {formattedRole}</h1>
+          <h1 className="text-xl font-bold">{formattedRole} Outreach</h1>
           <p className="text-sm text-slate-400 mt-1">{user?.name}</p>
           <p className="text-xs text-slate-500 mt-1">ID: {user?.employeeId}</p>
         </div>
@@ -57,7 +57,7 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
                 }}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                   activeTab === item.id 
-                    ? 'bg-blue-600 text-white' 
+                    ? 'bg-brand text-white' 
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
