@@ -14,7 +14,7 @@ export default function Footer() {
           className="h-5 w-5 object-contain"
         />
         <span>
-          &copy; {currentYear} Swastha Hospital (a Unit of Helse Medical Sciences). All Rights Reserved.
+          &copy; {currentYear} Swastha Hospital (A Unit of Helse Medical Sciences Pvt. Ltd.). All Rights Reserved.
         </span>
       </p>
     </footer>
