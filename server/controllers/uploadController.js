@@ -72,3 +72,28 @@ exports.getFile = (req, res) => {
     res.status(404).json({ status: 'fail', message: 'File not found.' });
   }
 };
+
+// Controller to delete an uploaded file
+exports.deleteFile = (req, res) => {
+  const filename = req.params.filename;
+  
+  // Basic path traversal prevention
+  if (!filename || filename.includes('..') || filename.includes('/')) {
+    return res.status(400).json({ status: 'fail', message: 'Invalid filename.' });
+  }
+
+  const filepath = path.join(__dirname, '../uploads', filename);
+
+  if (fs.existsSync(filepath)) {
+    fs.unlink(filepath, (err) => {
+      if (err) {
+        console.error("File deletion error:", err);
+        return res.status(500).json({ status: 'error', message: 'Failed to delete file from server.' });
+      }
+      res.status(200).json({ status: 'success', message: 'File deleted successfully.' });
+    });
+  } else {
+    // If the file is already missing, return success anyway so the frontend can clear its state
+    res.status(200).json({ status: 'success', message: 'File not found, assumed deleted.' });
+  }
+};

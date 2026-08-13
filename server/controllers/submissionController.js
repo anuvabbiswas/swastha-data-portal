@@ -1,20 +1,25 @@
 const prisma = require('../utils/prisma');
+const fs = require('fs');
+const path = require('path');
 
 // 1. Create a new data submission
 exports.createSubmission = async (req, res) => {
   try {
     // submissionData is a flexible JSON object (e.g., { "Question 1": "Answer 1" })
-    const { formType, submissionData } = req.body;
-    const associateId = req.user.id; // Pulled from the JWT token middleware
+    const { submissionData } = req.body;
 
-    if (!formType || !submissionData) {
-      return res.status(400).json({ status: 'fail', message: 'Missing form type or submission data.' });
+    if (!submissionData) {
+      return res.status(400).json({ status: 'fail', message: 'Missing submission data.' });
     }
+
+    // FIX: derive formType from the authenticated user's role, not the request body,
+    // so the fields fetched always match the formType actually stored.
+    const formType = req.user.role.toUpperCase();
 
     // Step A: Fetch the CURRENT active field definitions for this form type
     const activeFields = await prisma.fieldDefinition.findMany({
       where: { 
-        formType: formType.toUpperCase(),
+        formType,
         isActive: true 
       },
       orderBy: { displayOrder: 'asc' }
@@ -30,7 +35,7 @@ exports.createSubmission = async (req, res) => {
         associateId: req.user.id,
         associateName: req.user.name,
         associateEmployeeId: req.user.employeeId,
-        formType: req.user.role,
+        formType,
         submissionData,
         schemaSnapshot: activeFields
       }
@@ -127,18 +132,57 @@ exports.deleteSubmission = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verify the submission exists
-    const submission = await prisma.submission.findUnique({ where: { id } });
+    // 1. Fetch the submission BEFORE deleting it so we can inspect its payload
+    const submission = await prisma.submission.findUnique({
+      where: { id }
+    });
+
     if (!submission) {
       return res.status(404).json({ status: 'fail', message: 'Submission not found.' });
     }
 
-    // Hard delete from the database
-    await prisma.submission.delete({ where: { id } });
+    // 2. Parse the frozen schema snapshot to reliably identify media fields
+    const snapshot = typeof submission.schemaSnapshot === 'string' 
+      ? JSON.parse(submission.schemaSnapshot) 
+      : submission.schemaSnapshot;
 
-    res.status(200).json({ status: 'success', message: 'Submission permanently deleted.' });
+    const mediaFields = snapshot.filter(field => field.inputType === 'UPLOAD_MEDIA');
+
+    // 3. Iterate through media fields and securely delete the physical files
+    for (const field of mediaFields) {
+      const filename = submission.submissionData[field.fieldLabel];
+      
+      if (filename && typeof filename === 'string') {
+        // Prevent path traversal by strictly joining with the uploads directory
+        const filepath = path.join(__dirname, '../uploads', path.basename(filename));
+        
+        // 4. Data Integrity & Error Handling
+        if (fs.existsSync(filepath)) {
+          try {
+            fs.unlinkSync(filepath);
+            console.log(`[Cleanup] Deleted orphaned file: ${filename}`);
+          } catch (fileErr) {
+            console.error(`[Cleanup Error] Failed to delete file ${filename}:`, fileErr);
+            // We intentionally do not throw here. If file deletion fails 
+            // (e.g., file already missing or permissions issue), we still 
+            // want to allow the database record to be deleted so it doesn't get stuck.
+          }
+        }
+      }
+    }
+
+    // 5. Finally, safely delete the database record
+    await prisma.submission.delete({
+      where: { id }
+    });
+
+    res.status(200).json({ 
+      status: 'success', 
+      message: 'Submission and associated media files permanently deleted.' 
+    });
+
   } catch (error) {
-    console.error("Delete Submission Error:", error);
+    console.error('Error deleting submission:', error);
     res.status(500).json({ status: 'error', message: 'Failed to delete submission.' });
   }
 };

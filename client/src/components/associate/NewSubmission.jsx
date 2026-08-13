@@ -16,6 +16,7 @@ export default function NewSubmission() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isUploading = Object.values(uploadingFiles).some(Boolean);
   const [successMessage, setSuccessMessage] = useState('');
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
 
   // 1. Fetch the correct fields based on the user's role
   useEffect(() => {
@@ -110,6 +111,27 @@ export default function NewSubmission() {
     }
   };
 
+  // --- NEW: Remove Selected File Before Submission ---
+  const handleRemoveFile = async (fieldLabel, filename) => {
+    try {
+      // 1. Delete the physical file from the server
+      await fetch(`/api/uploads/${filename}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error('Failed to delete physical file', err);
+    } finally {
+      // 2. Remove the filename from React state
+      const updatedFormData = { ...formData };
+      delete updatedFormData[fieldLabel];
+      setFormData(updatedFormData);
+      
+      // 3. Force the file input DOM element to reset
+      setFileInputKey(Date.now());
+    }
+  };
+
   // 5. Submit the dynamic JSON payload to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,6 +196,7 @@ export default function NewSubmission() {
 
         setFormData(resetData);
         setOtherTextData({});
+        setFileInputKey(Date.now());
 
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
@@ -271,18 +294,31 @@ export default function NewSubmission() {
       case 'UPLOAD_MEDIA':
         return (
           <div className="space-y-2">
-            <input 
-              type="file" 
-              accept=".pdf,.jpg,.jpeg,.png"
-              required={field.isRequired && !value} 
-              onChange={(e) => handleFileUpload(field.fieldLabel, e.target.files[0])}
-              className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand-hover hover:file:bg-brand/20 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={uploadingFiles[field.fieldLabel]}
-            />
-            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-brand font-semibold animate-pulse">Uploading securely...</p>}
-            {value && !uploadingFiles[field.fieldLabel] && (
-              <p className="text-xs text-green-600 font-semibold">✓ File attached successfully.</p>
+            {!value ? (
+              <input 
+                key={fileInputKey} // <-- NEW: The magic DOM reset key
+                type="file" 
+                accept=".pdf,.jpg,.jpeg,.png"
+                required={field.isRequired} 
+                onChange={(e) => handleFileUpload(field.fieldLabel, e.target.files[0])}
+                className={`w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand-hover hover:file:bg-brand/20 ${uploadingFiles[field.fieldLabel] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={uploadingFiles[field.fieldLabel]}
+              />
+            ) : (
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <span className="text-sm text-green-800 font-medium truncate pr-4">
+                  ✓ {value}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFile(field.fieldLabel, value)}
+                  className="text-xs font-bold text-red-600 hover:text-red-800 transition-colors px-3 py-1.5 bg-red-100 hover:bg-red-200 rounded-md"
+                >
+                  Remove
+                </button>
+              </div>
             )}
+            {uploadingFiles[field.fieldLabel] && <p className="text-xs text-brand font-semibold animate-pulse">Uploading securely...</p>}
           </div>
         );
       default: return null;

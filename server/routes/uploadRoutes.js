@@ -13,4 +13,7 @@ router.post('/', uploadController.uploadMiddleware, uploadController.handleUploa
 // Route to fetch/view a file securely
 router.get('/:filename', uploadController.getFile);
 
+// Route to securely delete a file
+router.delete('/:filename', uploadController.deleteFile);
+
 module.exports = router;
