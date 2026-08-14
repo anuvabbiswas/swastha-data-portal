@@ -6,11 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(), // Injects Tailwind v4 directly into our build process
+    tailwindcss(),
   ],
   server: {
+    host: true,
     proxy: {
-      // Any request starting with /api will be routed to our Express backend
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,

@@ -34,7 +34,7 @@ export default function ResetPasswordModal({ user, onClose }) {
       setError('Passwords do not match. Please enter the new password again.');
       setNewPassword('');
       setConfirmPassword('');
-      setStep(1); // Restart the process as requested
+      setStep(1);
       return;
     }
 

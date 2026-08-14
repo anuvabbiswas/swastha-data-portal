@@ -4,7 +4,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Apply protection - Only Admins can view aggregate analytics
 router.use(authMiddleware.protect);
 router.use(authMiddleware.restrictTo('ADMIN'));
 

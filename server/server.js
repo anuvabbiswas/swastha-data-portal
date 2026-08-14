@@ -14,9 +14,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const app = express();
 
 // Global Middleware
-// Helmet secures our Express app by setting various HTTP headers
 app.use(helmet()); 
-// CORS allows our React frontend to communicate with this API safely
+// CORS allows React frontend to communicate with this API safely
 app.use(cors()); 
 // Parses incoming JSON payloads
 app.use(express.json()); 

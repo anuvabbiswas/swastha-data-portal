@@ -12,13 +12,10 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
     { id: 'history', label: 'My Submissions', icon: History },
   ];
 
-  // Helper to format the role nicely (e.g., "MARKETING" -> "Marketing")
   const formattedRole = user?.role.charAt(0) + user?.role.slice(1).toLowerCase();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-      
-      {/* Mobile Header */}
       <div className="md:hidden bg-sidebar text-white p-4 flex justify-between items-center z-20">
         <div>
           <h1 className="text-lg font-bold">{formattedRole} Outreach</h1>
@@ -33,7 +30,6 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
         </button>
       </div>
 
-      {/* Sidebar Navigation */}
       <aside className={`
         fixed md:static inset-y-0 left-0 transform ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0 transition-transform duration-200 ease-in-out z-10 
@@ -53,7 +49,7 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
                 key={item.id}
                 onClick={() => {
                   setActiveTab(item.id);
-                  setIsMobileMenuOpen(false); // Close menu on mobile after clicking
+                  setIsMobileMenuOpen(false);
                 }}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                   activeTab === item.id 
@@ -78,8 +74,6 @@ export default function AssociateLayout({ children, activeTab, setActiveTab }) {
           </button>
         </div>
       </aside>
-
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-6 relative">
           {children}

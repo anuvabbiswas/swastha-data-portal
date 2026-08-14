@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// Create the context
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -8,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // On initial load, check if we saved a token in localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
@@ -20,7 +18,6 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  // Function to handle login success
   const login = (userData, jwtToken) => {
     setUser(userData);
     setToken(jwtToken);
@@ -28,7 +25,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', jwtToken);
   };
 
-  // Function to handle secure logout (AUTH-3 requirement)
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -43,5 +39,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to make it easy for components to grab auth data
 export const useAuth = () => useContext(AuthContext);

@@ -2,25 +2,21 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// 1. Ensure uploads directory exists on the server
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// 2. Configure Multer Storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Generate a unique filename to prevent overwriting
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// 3. Strict Validation: 10MB limit and specific file types
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -32,21 +28,18 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: fileFilter
 });
 
-// Middleware to intercept the file upload
 exports.uploadMiddleware = upload.single('media');
 
-// Controller to handle the successful upload
 exports.handleUpload = (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ status: 'fail', message: 'No file uploaded or invalid file type.' });
     }
     
-    // Return the safe filename so the frontend can save it in the JSON submission
     res.status(200).json({
       status: 'success',
       data: {
@@ -61,7 +54,6 @@ exports.handleUpload = (req, res) => {
   }
 };
 
-// Controller to securely serve the file back to authorized users
 exports.getFile = (req, res) => {
   const filename = req.params.filename;
   const filepath = path.join(__dirname, '../uploads', filename);
@@ -73,11 +65,9 @@ exports.getFile = (req, res) => {
   }
 };
 
-// Controller to delete an uploaded file
 exports.deleteFile = (req, res) => {
   const filename = req.params.filename;
   
-  // Basic path traversal prevention
   if (!filename || filename.includes('..') || filename.includes('/')) {
     return res.status(400).json({ status: 'fail', message: 'Invalid filename.' });
   }
@@ -93,7 +83,6 @@ exports.deleteFile = (req, res) => {
       res.status(200).json({ status: 'success', message: 'File deleted successfully.' });
     });
   } else {
-    // If the file is already missing, return success anyway so the frontend can clear its state
     res.status(200).json({ status: 'success', message: 'File not found, assumed deleted.' });
   }
 };

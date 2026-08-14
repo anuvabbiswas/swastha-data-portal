@@ -15,8 +15,6 @@ export default function SubmissionsAudit() {
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterDate, setFilterDate] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
-
-  // --- NEW: Undo Deletion State ---
   const [pendingDeletion, setPendingDeletion] = useState(null);
 
   useEffect(() => {
@@ -39,7 +37,6 @@ export default function SubmissionsAudit() {
     else setExpandedRow(id);
   };
 
-  // --- NEW: Optimistic Delete Logic ---
   const executeDeletion = async (idToDel) => {
     try {
       await fetch(`/api/submissions/${idToDel}`, {
@@ -55,20 +52,16 @@ export default function SubmissionsAudit() {
   const handleDeleteClick = (id) => {
     if (!window.confirm("Are you sure you want to permanently delete this submission?")) return;
 
-    // If another deletion was waiting, execute it immediately
     if (pendingDeletion) {
       clearTimeout(pendingDeletion.timer);
       executeDeletion(pendingDeletion.id);
     }
 
-    // 1. Save original data in case of Undo
     const originalSub = submissions.find(s => s.id === id);
     
-    // 2. Optimistically remove from UI
     setSubmissions(prev => prev.filter(s => s.id !== id));
     if (expandedRow === id) setExpandedRow(null);
 
-    // 3. Start 3-second timer
     const timer = setTimeout(() => {
       executeDeletion(id);
     }, 3000);
@@ -78,9 +71,8 @@ export default function SubmissionsAudit() {
 
   const handleUndo = () => {
     if (pendingDeletion) {
-      clearTimeout(pendingDeletion.timer); // Cancel the API call
+      clearTimeout(pendingDeletion.timer);
       
-      // Put the row back into the UI and re-sort by date
       setSubmissions(prev => {
         const restored = [...prev, pendingDeletion.originalSub];
         return restored.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
@@ -126,7 +118,6 @@ export default function SubmissionsAudit() {
     });
   };
 
-  // --- NEW: Securely Fetch and View Protected Media ---
   const handleViewMedia = async (filename) => {
     try {
       const res = await fetch(`/api/uploads/${filename}`, {
@@ -159,12 +150,10 @@ export default function SubmissionsAudit() {
     }
   };
 
-  // --- NEW: Professional PDF Export ---
   const handleExportPDF = () => {
     setShowExportMenu(false);
     if (filteredSubmissions.length === 0) return alert("No data to export.");
 
-    // 1. Initialize Landscape PDF (better for wide data tables)
     const doc = new jsPDF('landscape');
     doc.setProperties({
       title: 'Submission Audit Report',
@@ -172,25 +161,24 @@ export default function SubmissionsAudit() {
       author: 'Swastha Hospital',
       creator: 'Swastha Data Collection Portal'
     });
-    // 2. Fetch the flattened data we already generate for Excel
+
     const flatData = generateExportData();
     if (flatData.length === 0) return;
 
     const headers = Object.keys(flatData[0]);
     const data = flatData.map(row => headers.map(h => row[h]));
 
-    // 3. Inject Professional Report Metadata
     doc.setFontSize(18);
-    doc.setTextColor(30, 41, 59); // slate-800
+    doc.setTextColor(30, 41, 59);
     doc.text('Swastha Hospital - Form Submission Report', 14, 22);
     
     doc.setFontSize(10);
-    doc.setTextColor(100, 116, 139); // slate-500
+    doc.setTextColor(100, 116, 139);
     doc.text(`Report Category: ${filterCategory === 'ALL' ? 'All Submissions' : filterCategory}`, 14, 30);
     doc.text(`Applied Date Filter: ${filterDate || 'None'}`, 14, 36);
     doc.text(`Generated On: ${new Date().toLocaleString()}`, 14, 42);
     doc.text(`Total Records: ${filteredSubmissions.length}`, 14, 48);
-    // 4. Generate the Auto-wrapping Table
+
     autoTable(doc, {
       startY: 56,
       head: [headers],
@@ -331,7 +319,6 @@ export default function SubmissionsAudit() {
                           <span>View</span>
                         </button>
                         
-                        {/* --- NEW: Delete Button --- */}
                         <button onClick={() => handleDeleteClick(sub.id)} className="inline-flex items-center space-x-1 px-3 py-1.5 bg-white border border-slate-300 rounded text-red-600 hover:bg-red-50 text-xs font-semibold" title="Delete Submission">
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -345,7 +332,7 @@ export default function SubmissionsAudit() {
                             <h4 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Submitted Form Data</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                               {Object.entries(sub.submissionData).map(([question, answer]) => {
-                                // Cross-reference snapshot to check if it's a media field
+                                
                                 const snapshot = typeof sub.schemaSnapshot === 'string' ? JSON.parse(sub.schemaSnapshot) : sub.schemaSnapshot;
                                 const fieldDef = snapshot.find(f => f.fieldLabel === question);
                                 const isMedia = fieldDef?.inputType === 'UPLOAD_MEDIA';
@@ -383,8 +370,6 @@ export default function SubmissionsAudit() {
           </div>
         )}
       </div>
-
-      {/* --- NEW: Optimistic Undo Toast Notification --- */}
       {pendingDeletion && (
         <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-4 z-50 animate-in fade-in slide-in-from-bottom-5">
           <span className="text-sm font-medium">Deleting in 3 seconds...</span>

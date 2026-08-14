@@ -9,7 +9,6 @@ export default function NewSubmission() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // This state will hold all the dynamic answers! (e.g., { "Doctor Name": "Dr. Smith", "Age": 45 })
   const [formData, setFormData] = useState({});
   const [otherTextData, setOtherTextData] = useState({});
   const [uploadingFiles, setUploadingFiles] = useState({});
@@ -18,7 +17,6 @@ export default function NewSubmission() {
   const [successMessage, setSuccessMessage] = useState('');
   const [fileInputKey, setFileInputKey] = useState(Date.now());
 
-  // 1. Fetch the correct fields based on the user's role
   useEffect(() => {
     const fetchFields = async () => {
       try {
@@ -30,7 +28,6 @@ export default function NewSubmission() {
         if (res.ok) {
           setFields(data.data.fields);
           
-          // Initialize formData object with empty values for each field
           const initialData = {};
           data.data.fields.forEach(field => {
             initialData[field.fieldLabel] = field.inputType === 'MULTI_SELECT' ? [] : '';
@@ -49,7 +46,6 @@ export default function NewSubmission() {
     fetchFields();
   }, [user.role, token]);
 
-  // 2. Handle dynamic input changes
   const handleInputChange = (fieldLabel, value) => {
     setFormData(prev => ({
       ...prev,
@@ -57,7 +53,6 @@ export default function NewSubmission() {
     }));
   };
 
-  // 3. Handle checkbox array logic for MULTI_SELECT
   const handleCheckboxChange = (fieldLabel, option, isChecked) => {
     setFormData(prev => {
       const currentSelections = prev[fieldLabel] || [];
@@ -69,11 +64,9 @@ export default function NewSubmission() {
     });
   };
 
-  // 4. Secure File Upload Handler
   const handleFileUpload = async (fieldLabel, file) => {
     if (!file) return;
     
-    // Strict Validation
     if (file.size > 10 * 1024 * 1024) {
       alert('Validation Error: File size exceeds the 10MB limit.');
       return;
@@ -84,13 +77,11 @@ export default function NewSubmission() {
       return;
     }
 
-    // Prepare FormData
     setUploadingFiles(prev => ({ ...prev, [fieldLabel]: true }));
     const uploadData = new FormData();
     uploadData.append('media', file);
 
     try {
-      // Send securely to backend (Note: Do NOT set Content-Type header for FormData)
       const res = await fetch('/api/uploads', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -99,7 +90,6 @@ export default function NewSubmission() {
       const data = await res.json();
       
       if (res.ok) {
-        // Save the returned filename string into the form JSON
         handleInputChange(fieldLabel, data.data.filename);
       } else {
         alert(data.message || 'File upload failed.');
@@ -111,10 +101,8 @@ export default function NewSubmission() {
     }
   };
 
-  // --- NEW: Remove Selected File Before Submission ---
   const handleRemoveFile = async (fieldLabel, filename) => {
     try {
-      // 1. Delete the physical file from the server
       await fetch(`/api/uploads/${filename}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -122,17 +110,14 @@ export default function NewSubmission() {
     } catch (err) {
       console.error('Failed to delete physical file', err);
     } finally {
-      // 2. Remove the filename from React state
       const updatedFormData = { ...formData };
       delete updatedFormData[fieldLabel];
       setFormData(updatedFormData);
       
-      // 3. Force the file input DOM element to reset
       setFileInputKey(Date.now());
     }
   };
 
-  // 5. Submit the dynamic JSON payload to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isUploading)
@@ -143,7 +128,6 @@ export default function NewSubmission() {
     setSuccessMessage('');
     setError('');
 
-    // Format data before sending
     const formattedData = { ...formData };
 
     fields.forEach(field => {
@@ -185,8 +169,6 @@ export default function NewSubmission() {
 
       if (res.ok) {
         setSuccessMessage('Data successfully submitted!');
-
-        // Reset form
         const resetData = {};
         fields.forEach(field => {
           resetData[field.fieldLabel] =
@@ -208,7 +190,6 @@ export default function NewSubmission() {
     }
   };
 
-  // 6. The Dynamic Renderer Function
   const renderInput = (field) => {
     const value = formData[field.fieldLabel];
     const commonClasses = "w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand transition-colors";
@@ -238,11 +219,9 @@ export default function NewSubmission() {
             <select required={field.isRequired} className={commonClasses} value={value || ''} onChange={(e) => handleInputChange(field.fieldLabel, e.target.value)}>
               <option value="" disabled>Select an option...</option>
               {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              {/* Inject Other */}
               {field.allowOther && <option value="Other">Other</option>}
             </select>
             
-            {/* Show text box if Other is selected */}
             {field.allowOther && value === 'Other' && (
               <input 
                 type="text" 
@@ -265,7 +244,6 @@ export default function NewSubmission() {
                 <span className="text-slate-700">{opt}</span>
               </label>
             ))}
-            {/* Inject Other Checkbox */}
             {field.allowOther && (
               <div className="space-y-2">
                 <label className="flex items-center space-x-3 cursor-pointer">
@@ -273,7 +251,6 @@ export default function NewSubmission() {
                   <span className="text-slate-700 italic">Other</span>
                 </label>
                 
-                {/* Show text box if Other is checked */}
                 {(value || []).includes('Other') && (
                   <input 
                     type="text" 
@@ -295,7 +272,7 @@ export default function NewSubmission() {
           <div className="space-y-2">
             {!value ? (
               <input 
-                key={fileInputKey} // <-- NEW: The magic DOM reset key
+                key={fileInputKey}
                 type="file" 
                 accept=".pdf,.jpg,.jpeg,.png"
                 required={field.isRequired} 
@@ -354,7 +331,6 @@ export default function NewSubmission() {
                 {field.fieldLabel} {field.isRequired && <span className="text-red-500">*</span>}
               </label>
 
-              {/* NEW: Conditionally render the description if it exists */}
               {field.description && (
                 <p className="text-xs text-slate-500 -mt-1">
                   {field.description}

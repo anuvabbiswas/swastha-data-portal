@@ -1,16 +1,16 @@
 const prisma = require('../utils/prisma');
 
-// Fetch all active fields for a specific form type
+
 exports.getFields = async (req, res) => {
   try {
-    const { formType } = req.params; // 'MARKETING' or 'COMMUNITY'
+    const { formType } = req.params;
     
     const fields = await prisma.fieldDefinition.findMany({
       where: { 
         formType: formType.toUpperCase(),
-        isActive: true // We only want to render active fields
+        isActive: true
       },
-      orderBy: { displayOrder: 'asc' } // Ensure questions appear in the order the admin created them
+      orderBy: { displayOrder: 'asc' }
     });
 
     res.status(200).json({ status: 'success', data: { fields } });
@@ -20,7 +20,6 @@ exports.getFields = async (req, res) => {
   }
 };
 
-// Create a new field definition
 exports.createField = async (req, res) => {
   try {
     const { formType, fieldLabel, description, inputType, isRequired, options, displayOrder, allowOther } = req.body;
@@ -54,7 +53,6 @@ exports.createField = async (req, res) => {
   }
 };
 
-// Soft delete a field (Set isActive to false)
 exports.deactivateField = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,16 +71,15 @@ exports.deactivateField = async (req, res) => {
   }
 };
 
-// Bulk update the display order of fields
 exports.reorderFields = async (req, res) => {
   try {
-    const { fields } = req.body; // Expects an array: [{ id: "123", displayOrder: 0 }, ...]
+    const { fields } = req.body;
 
     if (!fields || !Array.isArray(fields)) {
       return res.status(400).json({ status: 'fail', message: 'Invalid payload.' });
     }
 
-    // Use a Prisma transaction to ensure ALL fields update successfully, or NONE do.
+    
     const transaction = fields.map(field => 
       prisma.fieldDefinition.update({
         where: { id: field.id },
@@ -96,5 +93,38 @@ exports.reorderFields = async (req, res) => {
   } catch (error) {
     console.error("Reorder fields error:", error);
     res.status(500).json({ status: 'error', message: 'Failed to save new field order.' });
+  }
+};
+
+exports.updateField = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fieldLabel, description, inputType, isRequired, options, allowOther } = req.body;
+
+    if (!fieldLabel || !inputType) {
+      return res.status(400).json({ status: 'fail', message: 'Missing required field properties.' });
+    }
+
+    const existingField = await prisma.fieldDefinition.findUnique({ where: { id } });
+    if (!existingField) {
+      return res.status(404).json({ status: 'fail', message: 'Field not found.' });
+    }
+
+    const updatedField = await prisma.fieldDefinition.update({
+      where: { id },
+      data: {
+        fieldLabel,
+        description: description || null,
+        inputType,
+        isRequired: isRequired || false,
+        options: options || null,
+        allowOther: allowOther || false
+      }
+    });
+
+    res.status(200).json({ status: 'success', data: { field: updatedField } });
+  } catch (error) {
+    console.error('Error updating field:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to update field.' });
   }
 };

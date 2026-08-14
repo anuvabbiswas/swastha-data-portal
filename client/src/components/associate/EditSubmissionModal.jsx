@@ -4,8 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function EditSubmissionModal({ submission, onClose, onRefresh }) {
   const { token } = useAuth();
-  
-  // 1. Initialize State
   const [formData, setFormData] = useState({});
   const [otherTextData, setOtherTextData] = useState({});
   const [uploadingFiles, setUploadingFiles] = useState({});
@@ -36,12 +34,10 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
         return;
       }
 
-      // Handle Dropdown reverse parsing
       if (field.inputType === 'DROPDOWN' && typeof dbValue === 'string' && dbValue.startsWith('Other: ')) {
         initialFormData[field.fieldLabel] = 'Other';
         initialOtherData[field.fieldLabel] = dbValue.replace('Other: ', '');
-      } 
-      // Handle Multi-Select reverse parsing
+      }
       else if (field.inputType === 'MULTI_SELECT' && Array.isArray(dbValue)) {
         const parsedArray = dbValue.map(item => {
           if (typeof item === 'string' && item.startsWith('Other: ')) {
@@ -52,7 +48,6 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
         });
         initialFormData[field.fieldLabel] = parsedArray;
       } 
-      // Handle normal data
       else {
         initialFormData[field.fieldLabel] = dbValue;
       }
@@ -62,7 +57,6 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
     setOtherTextData(initialOtherData);
   }, [submission, snapshotFields]);
 
-  // 2. Handle Input Changes
   const handleInputChange = (fieldLabel, value) => {
     setFormData(prev => ({ ...prev, [fieldLabel]: value }));
   };
@@ -78,11 +72,9 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
     });
   };
 
-  // --- NEW: Secure File Upload Handler ---
   const handleFileUpload = async (fieldLabel, file) => {
     if (!file) return;
     
-    // 1. Strict Validation
     if (file.size > 10 * 1024 * 1024) {
       alert('Validation Error: File size exceeds the 10MB limit.');
       return;
@@ -93,13 +85,11 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
       return;
     }
 
-    // 2. Prepare FormData
     setUploadingFiles(prev => ({ ...prev, [fieldLabel]: true }));
     const uploadData = new FormData();
     uploadData.append('media', file);
 
     try {
-      // 3. Send securely to backend (Note: Do NOT set Content-Type header for FormData)
       const res = await fetch('/api/uploads', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -108,7 +98,6 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
       const data = await res.json();
       
       if (res.ok) {
-        // Save the returned filename string into the form JSON
         handleInputChange(fieldLabel, data.data.filename);
       } else {
         alert(data.message || 'File upload failed.');
@@ -119,11 +108,8 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
       setUploadingFiles(prev => ({ ...prev, [fieldLabel]: false }));
     }
   };
-
-  // --- NEW: Remove Selected File Before Submission ---
   const handleRemoveFile = async (fieldLabel, filename) => {
     try {
-      // 1. Delete the physical file from the server
       await fetch(`/api/uploads/${filename}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -131,23 +117,19 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
     } catch (err) {
       console.error('Failed to delete physical file', err);
     } finally {
-      // 2. Remove the filename from React state
       const updatedFormData = { ...formData };
       delete updatedFormData[fieldLabel];
       setFormData(updatedFormData);
-      
-      // 3. Force the file input DOM element to reset
+
       setFileInputKey(Date.now());
     }
   };
 
-  // 3. Submit the PATCH request
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
-    // Format the data exactly like NewSubmission.jsx does
     const formattedData = { ...formData };
     
     snapshotFields.forEach(field => {
@@ -190,7 +172,6 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
     }
   };
 
-  // 4. The Dynamic Renderer
   const renderInput = (field) => {
     const value = formData[field.fieldLabel];
     const commonClasses = "w-full p-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm";
@@ -266,7 +247,7 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
           <div className="space-y-2">
             {!value ? (
               <input 
-                key={fileInputKey} // <-- NEW: The magic DOM reset key
+                key={fileInputKey}
                 type="file" 
                 accept=".pdf,.jpg,.jpeg,.png"
                 required={field.isRequired} 

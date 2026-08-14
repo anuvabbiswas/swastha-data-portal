@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh }) {
   const { token } = useAuth();
   
-  // Initialize form data with the existing user values
   const [formData, setFormData] = useState({
     employeeId: user.employeeId,
     name: user.name,
@@ -51,7 +50,6 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
     }
   };
 
-  // --- NEW: Handle Permanent Deletion ---
   const handleDelete = async () => {
     const confirmMessage = "Are you sure you want to permanently delete this user?\n\nThis action cannot be undone.\nThe user's submitted forms will NOT be deleted.";
     
@@ -132,10 +130,8 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
           </form>
         </div>
 
-        {/* --- UPDATED: Footer with Delete Button --- */}
         <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
           <div>
-            {/* Self-Protection Rule: Hide delete button for the logged-in admin */}
             {user.id !== loggedInUserId && (
               <button 
                 type="button" 

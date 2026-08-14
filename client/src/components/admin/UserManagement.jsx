@@ -13,7 +13,6 @@ export default function UserManagement() {
   const [formData, setFormData] = useState({ employeeId: '', name: '', role: '', password: '' });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
-  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -87,9 +86,8 @@ export default function UserManagement() {
     }
   };
 
-  // --- NEW: Dynamic Filtering Logic ---
   const filteredUsers = users.filter(user => {
-    // 1. Search Logic (Case-insensitive)
+    // 1. Search Logic
     const matchesSearch = 
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       user.employeeId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -114,7 +112,6 @@ export default function UserManagement() {
       <h2 className="text-2xl font-bold text-slate-800 mb-6">User Management</h2>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Side: Create User Form */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit xl:col-span-1">
           <h3 className="text-lg font-semibold text-slate-800 mb-4">Create New Associate</h3>
           
@@ -152,10 +149,8 @@ export default function UserManagement() {
           </form>
         </div>
 
-        {/* Right Side: Directory & Filters */}
         <div className="xl:col-span-2 space-y-4">
           
-          {/* --- NEW: Search & Filter Control Bar --- */}
           <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-4 items-end sm:items-center">
             
             {/* Search Box */}
@@ -235,7 +230,6 @@ export default function UserManagement() {
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {/* Notice we map over filteredUsers instead of users */}
                     {filteredUsers.map((u) => (
                       <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                         <td className="p-4 font-medium text-slate-900">{u.employeeId}</td>
@@ -251,7 +245,6 @@ export default function UserManagement() {
                           </span>
                         </td>
                         <td className="p-4 text-right space-x-2">
-                          {/* 1. Edit Button (Available for everyone) */}
                           <button 
                             onClick={() => setEditingUser(u)}
                             className="inline-flex items-center p-1.5 text-slate-400 hover:text-brand hover:bg-brand/10 rounded transition-colors"
@@ -260,7 +253,6 @@ export default function UserManagement() {
                             <Edit3 className="w-4 h-4" />
                           </button>
                           
-                          {/* 2. Reset Password Button (Available for everyone) */}
                           <button 
                             onClick={() => setResettingPasswordUser(u)}
                             className="inline-flex items-center p-1.5 text-slate-400 hover:text-brand hover:bg-brand/10 rounded transition-colors"
@@ -269,7 +261,6 @@ export default function UserManagement() {
                             <Lock className="w-4 h-4" />
                           </button>
 
-                          {/* 3. Disable Button (Hidden ONLY if it's the logged-in Admin's row) */}
                           {u.id !== loggedInUser.id && (
                             <button 
                               onClick={() => handleToggleStatus(u.id, u.status, u.role)}
@@ -300,7 +291,6 @@ export default function UserManagement() {
           </div>
         </div>
       </div>
-      {/* Render the Edit Modal if a user is selected */}
       {editingUser && (
         <EditUserModal 
           user={editingUser} 
@@ -309,7 +299,6 @@ export default function UserManagement() {
           onRefresh={fetchUsers} 
         />
       )}
-      {/* Edit password modal */}
       {resettingPasswordUser && (
         <ResetPasswordModal 
           user={resettingPasswordUser} 

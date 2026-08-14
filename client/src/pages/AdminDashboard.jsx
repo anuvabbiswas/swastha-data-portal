@@ -11,7 +11,6 @@ export default function AdminDashboard() {
   return (
     <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
       {activeTab === 'users' && <UserManagement />}
-      
       {activeTab === 'fields' && <FieldManagement />}
       {activeTab === 'audit' && <SubmissionsAudit />}
       {activeTab === 'analytics' && <Analytics />}

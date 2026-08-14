@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Trash2, AlertCircle, GripVertical } from 'lucide-react';
+import { Trash2, AlertCircle, GripVertical, Edit2 } from 'lucide-react';
+import EditFieldModal from './EditFieldModal';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// --- Sub-component for individual Draggable Items ---
-function SortableFieldItem({ field, index, onDeactivate }) {
+function SortableFieldItem({ field, index, onDeactivate, onEdit }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 10 : 1,
   };
-
   return (
     <li ref={setNodeRef} style={style} className={`p-4 bg-white border-b border-slate-100 flex items-center justify-between group transition-colors ${isDragging ? 'shadow-lg ring-2 ring-brand rounded-lg relative' : 'hover:bg-slate-50'}`}>
       <div className="flex items-center space-x-4">
-        {/* Drag Handle */}
         <div {...attributes} {...listeners} className="cursor-grab hover:bg-slate-100 p-1 rounded active:cursor-grabbing text-slate-400">
           <GripVertical className="w-5 h-5" />
         </div>
@@ -47,32 +44,40 @@ function SortableFieldItem({ field, index, onDeactivate }) {
         </div>
       </div>
       
-      <button 
-        onClick={() => onDeactivate(field.id, field.fieldLabel)}
-        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-        title="Remove Field"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+      {/* Action Buttons */}
+      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all">
+        <button 
+          onClick={() => onEdit(field)}
+          className="p-2 text-slate-300 hover:text-brand hover:bg-brand/10 rounded-lg transition-all"
+          title="Edit Field"
+        >
+          <Edit2 className="w-4 h-4" />
+        </button>
+        <button 
+          onClick={() => onDeactivate(field.id, field.fieldLabel)}
+          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+          title="Remove Field"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
     </li>
   );
 }
 
-// --- Main Component ---
+// Main Component
 export default function FieldManagement() {
   const { token } = useAuth();
 
-  // State for which form the admin is currently editing
   const [activeFormType, setActiveFormType] = useState('MARKETING');
   const [fields, setFields] = useState([]);
+  const [editingField, setEditingField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // New Field Form State
   const [formData, setFormData] = useState({ fieldLabel: '', description: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
-  // Setup DnD Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -94,7 +99,7 @@ export default function FieldManagement() {
     }
   };
 
-  const  handleCreateField  = async (e) => {
+  const handleCreateField = async (e) => {
     e.preventDefault();
     setFormMessage({ type: '', text: '' });
 
@@ -131,27 +136,22 @@ export default function FieldManagement() {
     } catch (err) { alert('Network error occurred.'); }
   };
 
-  // --- NEW: Handle Drag End ---
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     
-    // If dropped in the same place, do nothing
     if (!over || active.id === over.id) return;
 
-    // 1. Calculate new array order locally (instant UI update for good UX)
     const oldIndex = fields.findIndex((f) => f.id === active.id);
     const newIndex = fields.findIndex((f) => f.id === over.id);
     const newFieldsArray = arrayMove(fields, oldIndex, newIndex);
     
     setFields(newFieldsArray);
 
-    // 2. Prepare payload mapping the new index to displayOrder
     const payload = newFieldsArray.map((field, index) => ({
       id: field.id,
       displayOrder: index
     }));
 
-    // 3. Send to backend
     try {
       await fetch('/api/fields/reorder', {
         method: 'PATCH',
@@ -160,7 +160,7 @@ export default function FieldManagement() {
       });
     } catch (error) {
       console.error("Failed to save reorder", error);
-      fetchFields(); // Revert on failure
+      fetchFields();
     }
   };
 
@@ -178,7 +178,6 @@ export default function FieldManagement() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Side: Create Field Form */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
            <h3 className="text-lg font-semibold text-slate-800 mb-4">Add question to {activeFormType.toUpperCase()}</h3>
            {formMessage.text && <div className={`mb-4 p-3 rounded text-sm font-medium ${formMessage.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{formMessage.text}</div>}
@@ -215,7 +214,6 @@ export default function FieldManagement() {
                    <input type="text" required value={formData.optionsString} onChange={(e) => setFormData({...formData, optionsString: e.target.value})} className="w-full p-2 border border-brand/30 rounded-lg focus:ring-2 focus:ring-brand" />
                  </div>
                  
-                 {/* --- NEW: Allow Other Checkbox --- */}
                  <div className="flex items-center space-x-2 border-t border-brand/30 pt-2">
                    <input 
                      type="checkbox" 
@@ -238,7 +236,6 @@ export default function FieldManagement() {
            </form>
         </div>
 
-        {/* Right Side: Current Fields List (With DnD) */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-200 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-slate-800">Current Form Layout of {activeFormType.toUpperCase()}</h3>
@@ -260,7 +257,7 @@ export default function FieldManagement() {
                 <SortableContext items={fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
                   <ul className="divide-y divide-slate-100">
                     {fields.map((field, index) => (
-                      <SortableFieldItem key={field.id} field={field} index={index} onDeactivate={handleDeactivate} />
+                      <SortableFieldItem key={field.id} field={field} index={index} onDeactivate={handleDeactivate} onEdit={setEditingField} />
                     ))}
                   </ul>
                 </SortableContext>
@@ -269,6 +266,13 @@ export default function FieldManagement() {
           </div>
         </div>
       </div>
+      {editingField && (
+        <EditFieldModal 
+          field={editingField} 
+          onClose={() => setEditingField(null)} 
+          onRefresh={fetchFields} 
+        />
+      )}
     </div>
   );
 }

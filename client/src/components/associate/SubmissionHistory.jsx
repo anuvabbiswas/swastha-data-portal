@@ -8,10 +8,8 @@ export default function SubmissionHistory() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // State for the Edit Modal
   const [editingSubmission, setEditingSubmission] = useState(null);
 
-  // Use useCallback so we can trigger a re-fetch after a successful edit
   const fetchHistory = useCallback(async () => {
     setLoading(true);
     try {

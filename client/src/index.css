@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Noto Sans - Default portal font*/
 @font-face {
   font-family: 'Noto Sans';
   src: url('/fonts/NotoSans-VariableFont_wdth,wght.ttf') format('truetype-variations');
@@ -7,11 +8,26 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Noto Sans';
   src: url('/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
   font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Playfair Display - Used only for portal title*/
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 400 900;
   font-style: italic;
   font-display: swap;
 }
@@ -27,4 +43,8 @@
 body {
   background-color: var(--color-slate-50);
   font-family: var(--font-sans);
+}
+
+.portal-title {
+  font-family: 'Playfair Display', serif;
 }

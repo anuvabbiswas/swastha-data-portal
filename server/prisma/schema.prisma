@@ -8,9 +8,6 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-// --- ENUMS ---
-// Enums restrict columns to specific, safe values.
-
 enum Role {
   ADMIN
   MARKETING
@@ -37,36 +34,33 @@ enum InputType {
   UPLOAD_MEDIA
 }
 
-// --- MODELS (TABLES) ---
-
 // 1. Users Table
-// Handles authentication and role-based access.
+
 model User {
   id           String     @id @default(uuid())
-  employeeId   String     @unique // The visible User ID (e.g., "MKT-001", "COM-002")
+  employeeId   String     @unique 
   name         String
-  passwordHash String // Hashed password for security
+  passwordHash String 
   role         Role
-  status       UserStatus @default(ACTIVE) // Allows Admins to disable accounts
+  status       UserStatus @default(ACTIVE) 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  // Relationship: A user can have many submissions
   submissions Submission[]
 }
 
-// 2. Field Definitions Table (The Dynamic Form Engine)
-// Stores the specific questions/fields configured by the Admin.
+// 2. Field Definitions Table
+
 model FieldDefinition {
   id           String    @id @default(uuid())
-  formType     FormType // Is this for Marketing or Community?
-  fieldLabel   String // e.g., "Number of Children"
+  formType     FormType 
+  fieldLabel   String 
   description  String?
   inputType    InputType
   isRequired   Boolean   @default(false)
-  options      Json? // Stores an array of strings for dropdown choices (e.g., ["Yes", "No", "Maybe"])
-  displayOrder Int       @default(0) // Controls the UI rendering order
-  isActive     Boolean   @default(true) // Instead of deleting fields, we "soft delete" them by making them inactive
+  options      Json? 
+  displayOrder Int       @default(0) 
+  isActive     Boolean   @default(true) 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   allowOther   Boolean   @default(false)
@@ -76,15 +70,10 @@ model FieldDefinition {
 model Submission {
   id                  String   @id @default(uuid())
   
-  // 1. Make this optional so the database allows SetNull
   associateId         String?  
-  // 2. Change onDelete behavior to SetNull
   associate           User?    @relation(fields: [associateId], references: [id], onDelete: SetNull)
-  
-  // 3. Add Denormalized fields (with defaults for existing rows)
   associateName       String   @default("Unknown Associate")
   associateEmployeeId String   @default("UNKNOWN-ID")
-
   formType            String
   submissionData      Json
   schemaSnapshot      Json
