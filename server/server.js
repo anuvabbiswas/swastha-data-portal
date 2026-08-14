@@ -15,7 +15,7 @@ const app = express();
 
 // Global Middleware
 app.use(helmet()); 
-// CORS allows React frontend to communicate with this API safely
+// CORS allows our React frontend to communicate with this API safely
 app.use(cors()); 
 // Parses incoming JSON payloads
 app.use(express.json()); 
