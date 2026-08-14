@@ -12,11 +12,8 @@ exports.createSubmission = async (req, res) => {
       return res.status(400).json({ status: 'fail', message: 'Missing submission data.' });
     }
 
-    // FIX: derive formType from the authenticated user's role, not the request body,
-    // so the fields fetched always match the formType actually stored.
     const formType = req.user.role.toUpperCase();
 
-    // Step A: Fetch the CURRENT active field definitions for this form type
     const activeFields = await prisma.fieldDefinition.findMany({
       where: { 
         formType,

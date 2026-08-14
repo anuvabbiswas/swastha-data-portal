@@ -61,6 +61,7 @@ model FieldDefinition {
   id           String    @id @default(uuid())
   formType     FormType // Is this for Marketing or Community?
   fieldLabel   String // e.g., "Number of Children"
+  description  String?
   inputType    InputType
   isRequired   Boolean   @default(false)
   options      Json? // Stores an array of strings for dropdown choices (e.g., ["Yes", "No", "Maybe"])

@@ -177,7 +177,6 @@ export default function NewSubmission() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          formType: user.role,
           submissionData: formattedData
         })
       });
@@ -354,6 +353,14 @@ export default function NewSubmission() {
               <label className="block text-sm font-semibold text-slate-800">
                 {field.fieldLabel} {field.isRequired && <span className="text-red-500">*</span>}
               </label>
+
+              {/* NEW: Conditionally render the description if it exists */}
+              {field.description && (
+                <p className="text-xs text-slate-500 -mt-1">
+                  {field.description}
+                </p>
+              )}
+
               {renderInput(field)}
             </div>
           ))}

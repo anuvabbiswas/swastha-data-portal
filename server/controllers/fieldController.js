@@ -23,12 +23,10 @@ exports.getFields = async (req, res) => {
 // Create a new field definition
 exports.createField = async (req, res) => {
   try {
-    const { formType, fieldLabel, inputType, isRequired, options, displayOrder, allowOther } = req.body;
-
+    const { formType, fieldLabel, description, inputType, isRequired, options, displayOrder, allowOther } = req.body;
     if (!formType || !fieldLabel || !inputType) {
       return res.status(400).json({ status: 'fail', message: 'Missing required field properties.' });
     }
-
     let order = displayOrder;
     if (order === undefined) {
       const lastField = await prisma.fieldDefinition.findFirst({
@@ -37,11 +35,11 @@ exports.createField = async (req, res) => {
       });
       order = lastField ? lastField.displayOrder + 1 : 0;
     }
-
     const newField = await prisma.fieldDefinition.create({
       data: {
         formType: formType.toUpperCase(),
         fieldLabel,
+        description: description || null,
         inputType,
         isRequired: isRequired || false,
         options: options || null,
@@ -49,7 +47,6 @@ exports.createField = async (req, res) => {
         allowOther: allowOther || false 
       }
     });
-
     res.status(201).json({ status: 'success', data: { field: newField } });
   } catch (error) {
     console.error("Error creating field:", error);
@@ -58,7 +55,6 @@ exports.createField = async (req, res) => {
 };
 
 // Soft delete a field (Set isActive to false)
-// We never hard delete fields, so old historical submissions don't lose context
 exports.deactivateField = async (req, res) => {
   try {
     const { id } = req.params;

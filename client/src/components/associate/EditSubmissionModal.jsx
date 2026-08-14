@@ -324,6 +324,11 @@ export default function EditSubmissionModal({ submission, onClose, onRefresh }) 
                   <label className="block text-sm font-semibold text-slate-800">
                     {field.fieldLabel} {field.isRequired && <span className="text-red-500">*</span>}
                   </label>
+                  {field.description && (
+                    <p className="text-xs text-slate-500 -mt-1">
+                      {field.description}
+                    </p>
+                  )}
                   {renderInput(field)}
                 </div>
               ))

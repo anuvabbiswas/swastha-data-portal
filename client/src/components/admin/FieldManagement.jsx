@@ -31,6 +31,9 @@ function SortableFieldItem({ field, index, onDeactivate }) {
             {field.fieldLabel}
             {field.isRequired && <span className="ml-2 text-red-500 text-xs font-bold" title="Required">*</span>}
           </h4>
+          {field.description && (
+            <p className="text-xs text-slate-400 mt-0.5">{field.description}</p>
+          )}
           <div className="flex items-center space-x-2 mt-1">
             <span className="px-2 py-0.5 bg-brand/10 text-brand-hover rounded text-[10px] font-bold tracking-wider uppercase">
               {field.inputType.replace('_', ' ')}
@@ -66,7 +69,7 @@ export default function FieldManagement() {
   const [error, setError] = useState('');
 
   // New Field Form State
-  const [formData, setFormData] = useState({ fieldLabel: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
+  const [formData, setFormData] = useState({ fieldLabel: '', description: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
   // Setup DnD Sensors
@@ -91,7 +94,7 @@ export default function FieldManagement() {
     }
   };
 
-  const handleCreateField = async (e) => {
+  const  handleCreateField  = async (e) => {
     e.preventDefault();
     setFormMessage({ type: '', text: '' });
 
@@ -109,8 +112,8 @@ export default function FieldManagement() {
       });
       if (res.ok) {
         setFormMessage({ type: 'success', text: 'Field added successfully!' });
-        setFormData({ fieldLabel: '', inputType: 'TEXT', isRequired: false, optionsString: '' });
-        fetchFields(); 
+        setFormData({ fieldLabel: '', description: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
+        fetchFields();
       } else {
         const data = await res.json();
         setFormMessage({ type: 'error', text: data.message });
@@ -180,7 +183,19 @@ export default function FieldManagement() {
            <h3 className="text-lg font-semibold text-slate-800 mb-4">Add question to {activeFormType.toUpperCase()}</h3>
            {formMessage.text && <div className={`mb-4 p-3 rounded text-sm font-medium ${formMessage.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{formMessage.text}</div>}
            <form onSubmit={handleCreateField} className="space-y-4">
-             <div><label className="block text-sm font-medium text-slate-700 mb-1">Question / Field Label</label><input type="text" required value={formData.fieldLabel} onChange={(e) => setFormData({...formData, fieldLabel: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" placeholder="e.g. Full Name" /></div>
+             <div><label className="block text-sm font-medium text-slate-700 mb-1">Question / Field Label</label><input type="text" required value={formData.fieldLabel} onChange={(e) => setFormData({...formData, fieldLabel: e.target.value})} className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" placeholder="Add question" /></div>
+             <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Description <span className="text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <input 
+                  type="text" 
+                  value={formData.description} 
+                  onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-brand" 
+                  placeholder="Add question description" 
+                />
+             </div>
              <div>
                <label className="block text-sm font-medium text-slate-700 mb-1">Response Type</label>
                <select required value={formData.inputType} onChange={(e) => setFormData({...formData, inputType: e.target.value})} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm">
