@@ -154,9 +154,3 @@ Server-specific (`server/package.json`):
 - Rate limiting is applied globally and more strictly on the login endpoint.
 - `server/uploads/` is excluded from version control; uploaded files are runtime data, not source code.
 If you believe you've found a security issue in this codebase, report it directly to the project maintainer rather than filing a public issue, given this is a proprietary, internally-used system handling hospital data.
- 
----
- 
-## License
- 
-Proprietary — All Rights Reserved. This codebase is the property of Helse Medical Sciences Pvt Ltd / Swastha Hospital and is not licensed for use, copying, or distribution outside the organization.
