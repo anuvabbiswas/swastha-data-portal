@@ -3,7 +3,7 @@ import { X, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function ResetPasswordModal({ user, onClose }) {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   
   const [step, setStep] = useState(1);
   const [newPassword, setNewPassword] = useState('');
@@ -29,7 +29,6 @@ export default function ResetPasswordModal({ user, onClose }) {
   };
 
   const handleSubmit = async () => {
-    // 1. Strict Validation Rule
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match. Please enter the new password again.');
       setNewPassword('');
@@ -37,23 +36,17 @@ export default function ResetPasswordModal({ user, onClose }) {
       setStep(1);
       return;
     }
-
     setIsSubmitting(true);
     setError('');
-
     try {
-      // 2. API Call (Only fires if validation passes)
-      const res = await fetch(`/api/users/${user.id}/reset-password`, {
+      const res = await authFetch(`/api/users/${user.id}/reset-password`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ newPassword: newPassword })
       });
-
       const data = await res.json();
-
       if (res.ok) {
         setSuccess(true);
         setTimeout(() => {
@@ -82,7 +75,6 @@ export default function ResetPasswordModal({ user, onClose }) {
             <X className="w-5 h-5" />
           </button>
         </div>
-
         <div className="p-6">
           {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">{error}</div>}
           {success && (
@@ -90,7 +82,6 @@ export default function ResetPasswordModal({ user, onClose }) {
               <CheckCircle2 className="w-5 h-5 mr-2" /> Password reset successfully!
             </div>
           )}
-
           {!success && (
             <div className="space-y-4">
               {step === 1 ? (
@@ -142,7 +133,6 @@ export default function ResetPasswordModal({ user, onClose }) {
             </div>
           )}
         </div>
-
         {!success && (
           <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
             {step === 1 ? (
@@ -175,7 +165,6 @@ export default function ResetPasswordModal({ user, onClose }) {
             )}
           </div>
         )}
-
       </div>
     </div>
   );

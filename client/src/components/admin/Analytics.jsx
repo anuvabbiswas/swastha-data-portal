@@ -9,7 +9,7 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#ef4444'];
 
 export default function Analytics() {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   
   // States
   const [loading, setLoading] = useState(true);
@@ -30,8 +30,7 @@ export default function Analytics() {
         if (startDate && endDate) {
           url += `&startDate=${startDate}&endDate=${endDate}`;
         }
-
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await authFetch(url);
         const result = await res.json();
         
         if (res.ok) setData(result.data);
@@ -42,7 +41,7 @@ export default function Analytics() {
       }
     };
     fetchAnalytics();
-  }, [category, startDate, endDate, token]);
+  }, [category, startDate, endDate]);
 
   const clearDateFilter = () => {
     setStartDate('');
@@ -67,7 +66,6 @@ export default function Analytics() {
           <button onClick={() => { setCategory('COMMUNITY'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community</button>
         </div>
       </div>
-
       {/* 2. Control Bar (Filters & Total Card) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
         
@@ -83,7 +81,6 @@ export default function Analytics() {
             <BarChart3 className="w-6 h-6" />
           </div>
         </div>
-
         {/* Filters */}
         <div className="lg:col-span-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-end md:items-center">
           
@@ -97,7 +94,6 @@ export default function Analytics() {
               <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm" />
             </div>
           </div>
-
           <div className="flex-1 w-full">
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center">
               <Filter className="w-3 h-3 mr-1" /> Question Filter
@@ -107,7 +103,6 @@ export default function Analytics() {
               {data.charts.map(c => <option key={c.question} value={c.question}>{c.question}</option>)}
             </select>
           </div>
-
           {(startDate || endDate) && (
             <button onClick={clearDateFilter} className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors justify-center whitespace-nowrap">
               <XCircle className="w-4 h-4 mr-2" /> Clear Dates
@@ -115,7 +110,6 @@ export default function Analytics() {
           )}
         </div>
       </div>
-
       {/* 3. Charts Grid */}
       {loading ? (
         <div className="text-center p-12 text-slate-500 font-medium">Analyzing data...</div>
@@ -135,7 +129,6 @@ export default function Analytics() {
                   {chart.type.replace('_', ' ')}
                 </p>
               </div>
-
               <div className="flex-1 min-h-[300px] flex items-center justify-center">
                 {!chart.hasData ? (
                   <div className="text-center text-slate-400 flex flex-col items-center">

@@ -19,28 +19,27 @@ exports.login = async (req, res) => {
       });
     }
 
+    const invalidCredentialsResponse = () =>
+      res.status(401).json({
+        status: 'fail',
+        message: 'Invalid Employee ID, password, or role.',
+      });
+
     const user = await prisma.user.findUnique({
       where: { employeeId },
     });
 
     if (!user) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'User ID does not exist.',
-      });
+      return invalidCredentialsResponse();
     }
+
     if (user.role !== role) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'Incorrect role selected.',
-      });
+      return invalidCredentialsResponse();
     }
+
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
     if (!passwordMatch) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'Incorrect password.',
-      });
+      return invalidCredentialsResponse();
     }
 
     if (user.status === 'DISABLED') {
@@ -51,7 +50,6 @@ exports.login = async (req, res) => {
     }
 
     const token = signToken(user.id, user.role);
-
     res.status(200).json({
       status: 'success',
       token,
@@ -64,7 +62,6 @@ exports.login = async (req, res) => {
         }
       }
     });
-
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({

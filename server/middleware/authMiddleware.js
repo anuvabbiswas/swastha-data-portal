@@ -4,20 +4,34 @@ const prisma = require('../utils/prisma');
 exports.protect = async (req, res, next) => {
   try {
     let token;
-    
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
-
     if (!token) {
       return res.status(401).json({ status: 'fail', message: 'You are not logged in. Please log in to get access.' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const currentUser = await prisma.user.findUnique({ where: { id: decoded.id } });
+    // Exclude passwordHash from what gets attached to req.user
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        employeeId: true,
+        name: true,
+        role: true,
+        status: true
+      }
+    });
+
     if (!currentUser) {
       return res.status(401).json({ status: 'fail', message: 'The user belonging to this token does no longer exist.' });
+    }
+
+    if (currentUser.status === 'DISABLED') {
+      return res.status(401).json({ status: 'fail', message: 'This account has been disabled. Please contact an Administrator.' });
     }
 
     req.user = currentUser;

@@ -67,14 +67,12 @@ function SortableFieldItem({ field, index, onDeactivate, onEdit }) {
 
 // Main Component
 export default function FieldManagement() {
-  const { token } = useAuth();
-
+  const { authFetch } = useAuth();
   const [activeFormType, setActiveFormType] = useState('MARKETING');
   const [fields, setFields] = useState([]);
   const [editingField, setEditingField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [formData, setFormData] = useState({ fieldLabel: '', description: '', inputType: 'TEXT', isRequired: false, optionsString: '', allowOther: false });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
 
@@ -88,7 +86,7 @@ export default function FieldManagement() {
   const fetchFields = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/fields/${activeFormType}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await authFetch(`/api/fields/${activeFormType}`);
       const data = await res.json();
       if (res.ok) setFields(data.data.fields);
       else setError(data.message);
@@ -102,17 +100,15 @@ export default function FieldManagement() {
   const handleCreateField = async (e) => {
     e.preventDefault();
     setFormMessage({ type: '', text: '' });
-
     let parsedOptions = null;
     if (['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType)) {
       if (!formData.optionsString.trim()) return setFormMessage({ type: 'error', text: 'Dropdowns require at least one option.' });
       parsedOptions = formData.optionsString.split(',').map(opt => opt.trim()).filter(Boolean);
     }
-
     try {
-      const res = await fetch('/api/fields', {
+      const res = await authFetch('/api/fields', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, formType: activeFormType, options: parsedOptions, allowOther: formData.allowOther })
       });
       if (res.ok) {
@@ -131,7 +127,7 @@ export default function FieldManagement() {
   const handleDeactivate = async (fieldId, fieldLabel) => {
     if (!window.confirm(`Are you sure you want to remove "${fieldLabel}"?`)) return;
     try {
-      const res = await fetch(`/api/fields/${fieldId}/deactivate`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await authFetch(`/api/fields/${fieldId}/deactivate`, { method: 'PATCH' });
       if (res.ok) fetchFields();
     } catch (err) { alert('Network error occurred.'); }
   };
@@ -140,22 +136,19 @@ export default function FieldManagement() {
     const { active, over } = event;
     
     if (!over || active.id === over.id) return;
-
     const oldIndex = fields.findIndex((f) => f.id === active.id);
     const newIndex = fields.findIndex((f) => f.id === over.id);
     const newFieldsArray = arrayMove(fields, oldIndex, newIndex);
     
     setFields(newFieldsArray);
-
     const payload = newFieldsArray.map((field, index) => ({
       id: field.id,
       displayOrder: index
     }));
-
     try {
-      await fetch('/api/fields/reorder', {
+      await authFetch('/api/fields/reorder', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields: payload })
       });
     } catch (error) {
@@ -176,7 +169,6 @@ export default function FieldManagement() {
           <button onClick={() => setActiveFormType('COMMUNITY')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community Form</button>
         </div>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
            <h3 className="text-lg font-semibold text-slate-800 mb-4">Add question to {activeFormType.toUpperCase()}</h3>
@@ -235,7 +227,6 @@ export default function FieldManagement() {
              <button type="submit" className="w-full bg-brand text-white font-semibold py-2 rounded-lg hover:bg-brand-hover mt-2">Add Field to Form</button>
            </form>
         </div>
-
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-200 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-slate-800">Current Form Layout of {activeFormType.toUpperCase()}</h3>

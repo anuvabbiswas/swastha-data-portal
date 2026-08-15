@@ -4,7 +4,7 @@ import { Calendar, Edit3, AlertCircle } from 'lucide-react';
 import EditSubmissionModal from './EditSubmissionModal';
 
 export default function SubmissionHistory() {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -13,9 +13,7 @@ export default function SubmissionHistory() {
   const fetchHistory = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/submissions/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await authFetch('/api/submissions/me');
       const data = await res.json();
       if (res.ok) setSubmissions(data.data.submissions);
     } catch (err) {
@@ -23,7 +21,7 @@ export default function SubmissionHistory() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [authFetch]);
 
   useEffect(() => {
     fetchHistory();
@@ -38,7 +36,6 @@ export default function SubmissionHistory() {
           <p className="text-sm sm:text-base text-slate-500 mt-1">Review and modify the data you have collected.</p>
         </div>
       </div>
-
       {loading ? (
         <div className="text-slate-500 text-center mt-10">Loading history...</div>
       ) : submissions.length === 0 ? (
@@ -96,7 +93,6 @@ export default function SubmissionHistory() {
           ))}
         </div>
       )}
-
       {editingSubmission && (
         <EditSubmissionModal 
           submission={editingSubmission} 

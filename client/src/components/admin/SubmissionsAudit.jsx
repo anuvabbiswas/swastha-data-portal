@@ -7,11 +7,10 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export default function SubmissionsAudit() {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRow, setExpandedRow] = useState(null);
-
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterDate, setFilterDate] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -20,7 +19,7 @@ export default function SubmissionsAudit() {
   useEffect(() => {
     const fetchAllSubmissions = async () => {
       try {
-        const res = await fetch('/api/submissions/all', { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await authFetch('/api/submissions/all');
         const data = await res.json();
         if (res.ok) setSubmissions(data.data.submissions);
       } catch (err) {
@@ -30,7 +29,7 @@ export default function SubmissionsAudit() {
       }
     };
     fetchAllSubmissions();
-  }, [token]);
+  }, []);
 
   const toggleRow = (id) => {
     if (expandedRow === id) setExpandedRow(null);
@@ -39,9 +38,8 @@ export default function SubmissionsAudit() {
 
   const executeDeletion = async (idToDel) => {
     try {
-      await fetch(`/api/submissions/${idToDel}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      await authFetch(`/api/submissions/${idToDel}`, {
+        method: 'DELETE'
       });
     } catch (e) {
       console.error("Failed to delete", e);
@@ -51,12 +49,10 @@ export default function SubmissionsAudit() {
 
   const handleDeleteClick = (id) => {
     if (!window.confirm("Are you sure you want to permanently delete this submission?")) return;
-
     if (pendingDeletion) {
       clearTimeout(pendingDeletion.timer);
       executeDeletion(pendingDeletion.id);
     }
-
     const originalSub = submissions.find(s => s.id === id);
     
     setSubmissions(prev => prev.filter(s => s.id !== id));
@@ -65,7 +61,6 @@ export default function SubmissionsAudit() {
     const timer = setTimeout(() => {
       executeDeletion(id);
     }, 3000);
-
     setPendingDeletion({ id, timer, originalSub });
   };
 
@@ -120,9 +115,7 @@ export default function SubmissionsAudit() {
 
   const handleViewMedia = async (filename) => {
     try {
-      const res = await fetch(`/api/uploads/${filename}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await authFetch(`/api/uploads/${filename}`);
       if (!res.ok) throw new Error('Failed to fetch file');
       
       const blob = await res.blob();
@@ -153,7 +146,6 @@ export default function SubmissionsAudit() {
   const handleExportPDF = () => {
     setShowExportMenu(false);
     if (filteredSubmissions.length === 0) return alert("No data to export.");
-
     const doc = new jsPDF('landscape');
     doc.setProperties({
       title: 'Submission Audit Report',
@@ -183,34 +175,28 @@ export default function SubmissionsAudit() {
       startY: 56,
       head: [headers],
       body: data,
-
       theme: 'grid',
-
       styles: {
         fontSize: 8,
         cellPadding: 4,
         overflow: 'linebreak',
         valign: 'middle'
       },
-
       headStyles: {
         fillColor: [15, 118, 110],
         textColor: 255,
         fontStyle: 'bold'
       },
-
       alternateRowStyles: {
         fillColor: [248, 250, 252]
       },
-
       columnStyles: {
-        0: { cellWidth: 40 },   // Submission ID
-        1: { cellWidth: 40 },   // Date
-        2: { cellWidth: 35 },   // Associate
-        3: { cellWidth: 25 },   // Employee ID
-        4: { cellWidth: 25 }    // Category
+        0: { cellWidth: 40 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 35 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 25 }
       },
-
       horizontalPageBreak: true,
       horizontalPageBreakRepeat: [
         'Submission ID',
@@ -242,7 +228,7 @@ export default function SubmissionsAudit() {
       author: 'Swastha Hospital',
       creator: 'Swastha Data Collection Portal'
     });
-    // 5. Trigger Download
+
     const fileName = `Swastha_Report_${filterCategory}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
   };
@@ -268,7 +254,6 @@ export default function SubmissionsAudit() {
           )}
         </div>
       </div>
-
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col sm:flex-row gap-4 items-end sm:items-center">
         <div className="flex-1 w-full sm:w-auto">
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center"><Filter className="w-3 h-3 mr-1" /> Category</label>
@@ -282,7 +267,6 @@ export default function SubmissionsAudit() {
           <button onClick={() => { setFilterCategory('ALL'); setFilterDate(''); }} className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg w-full sm:w-auto justify-center"><XCircle className="w-4 h-4 mr-2" /> Clear Filters</button>
         )}
       </div>
-
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-slate-500">Loading audit logs...</div>
@@ -336,7 +320,6 @@ export default function SubmissionsAudit() {
                                 const snapshot = typeof sub.schemaSnapshot === 'string' ? JSON.parse(sub.schemaSnapshot) : sub.schemaSnapshot;
                                 const fieldDef = snapshot.find(f => f.fieldLabel === question);
                                 const isMedia = fieldDef?.inputType === 'UPLOAD_MEDIA';
-
                                 return (
                                   <div key={question}>
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{question}</p>

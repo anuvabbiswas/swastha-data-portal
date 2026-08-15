@@ -3,10 +3,9 @@ import { X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function EditFieldModal({ field, onClose, onRefresh }) {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-
   const [formData, setFormData] = useState({
     fieldLabel: field.fieldLabel || '',
     description: field.description || '',
@@ -19,7 +18,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
   const handleUpdateField = async (e) => {
     e.preventDefault();
     setError('');
-
     let parsedOptions = null;
     if (['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType)) {
       if (!formData.optionsString.trim()) {
@@ -27,9 +25,7 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
       }
       parsedOptions = formData.optionsString.split(',').map(opt => opt.trim()).filter(Boolean);
     }
-
     setIsSubmitting(true);
-
     const payload = {
       fieldLabel: formData.fieldLabel,
       description: formData.description,
@@ -38,17 +34,14 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
       allowOther: formData.allowOther,
       options: parsedOptions
     };
-
     try {
-      const res = await fetch(`/api/fields/${field.id}`, {
+      const res = await authFetch(`/api/fields/${field.id}`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
-
       if (res.ok) {
         onRefresh();
         onClose();
@@ -72,12 +65,10 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
             <X className="w-5 h-5" />
           </button>
         </div>
-
         <form onSubmit={handleUpdateField} className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
           {error && (
             <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium">{error}</div>
           )}
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Field Label</label>
             <input
@@ -88,7 +79,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
               className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Description <span className="text-slate-400 font-normal">(Optional)</span>
@@ -100,7 +90,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
               className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Data Type</label>
             <select
@@ -118,7 +107,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
               <option value="UPLOAD_MEDIA">Upload Media (PDF/JPG/PNG)</option>
             </select>
           </div>
-
           {['DROPDOWN', 'MULTI_SELECT'].includes(formData.inputType) && (
             <div className="p-3 bg-brand/10 border border-brand/20 rounded-lg space-y-3">
               <div>
@@ -132,7 +120,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
                   placeholder="e.g. Option 1, Option 2"
                 />
               </div>
-
               <div className="flex items-center space-x-2 border-t border-brand/30 pt-2">
                 <input
                   type="checkbox"
@@ -147,7 +134,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
               </div>
             </div>
           )}
-
           <div className="flex items-center mt-2">
             <input
               type="checkbox"
@@ -161,7 +147,6 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
             </label>
           </div>
         </form>
-
         <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
           <button
             type="button"

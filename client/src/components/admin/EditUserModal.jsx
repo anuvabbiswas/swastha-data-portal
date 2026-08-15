@@ -3,14 +3,13 @@ import { X, CheckCircle2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh }) {
-  const { token } = useAuth();
+  const { authFetch } = useAuth();
   
   const [formData, setFormData] = useState({
     employeeId: user.employeeId,
     name: user.name,
     role: user.role
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -20,19 +19,15 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
-
     try {
-      const res = await fetch(`/api/users/${user.id}/details`, {
+      const res = await authFetch(`/api/users/${user.id}/details`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
-
       const data = await res.json();
-
       if (res.ok) {
         setSuccessMessage('Details updated successfully!');
         setSuccess(true);
@@ -54,20 +49,13 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
     const confirmMessage = "Are you sure you want to permanently delete this user?\n\nThis action cannot be undone.\nThe user's submitted forms will NOT be deleted.";
     
     if (!window.confirm(confirmMessage)) return;
-
     setIsSubmitting(true);
     setError('');
-
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const res = await authFetch(`/api/users/${user.id}`, {
+        method: 'DELETE'
       });
-
       const data = await res.json();
-
       if (res.ok) {
         setSuccessMessage('User permanently deleted.');
         setSuccess(true);
@@ -95,7 +83,6 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
             <X className="w-5 h-5" />
           </button>
         </div>
-
         <div className="p-6">
           {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">{error}</div>}
           {success && (
@@ -103,7 +90,6 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
               <CheckCircle2 className="w-5 h-5 mr-2" /> {successMessage}
             </div>
           )}
-
           <form id="edit-user-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
@@ -129,7 +115,6 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
             </div>
           </form>
         </div>
-
         <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
           <div>
             {user.id !== loggedInUserId && (
@@ -159,7 +144,6 @@ export default function EditUserModal({ user, loggedInUserId, onClose, onRefresh
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

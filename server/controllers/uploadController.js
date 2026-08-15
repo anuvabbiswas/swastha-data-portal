@@ -7,18 +7,28 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Map validated MIME types to a fixed, safe extension
+const mimeToExtension = {
+  'application/pdf': '.pdf',
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png'
+};
+
+const allowedTypes = Object.keys(mimeToExtension);
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const safeExtension = mimeToExtension[file.mimetype] || '';
+    cb(null, uniqueSuffix + safeExtension);
   }
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -39,13 +49,13 @@ exports.handleUpload = (req, res) => {
     if (!req.file) {
       return res.status(400).json({ status: 'fail', message: 'No file uploaded or invalid file type.' });
     }
-    
+
     res.status(200).json({
       status: 'success',
       data: {
         filename: req.file.filename,
         originalName: req.file.originalname,
-        url: `/api/uploads/${req.file.filename}` 
+        url: `/api/uploads/${req.file.filename}`
       }
     });
   } catch (error) {
@@ -54,9 +64,25 @@ exports.handleUpload = (req, res) => {
   }
 };
 
+// Helper: resolve a filename safely against uploadDir, rejecting any path-traversal attempt regardless of how it's encoded.
+const resolveSafePath = (filename) => {
+  if (!filename) return null;
+  const safeName = path.basename(filename);
+  const resolvedPath = path.resolve(uploadDir, safeName);
+
+  // Ensure the resolved path is still actually inside uploadDir
+  if (!resolvedPath.startsWith(path.resolve(uploadDir) + path.sep)) {
+    return null;
+  }
+  return resolvedPath;
+};
+
 exports.getFile = (req, res) => {
-  const filename = req.params.filename;
-  const filepath = path.join(__dirname, '../uploads', filename);
+  const filepath = resolveSafePath(req.params.filename);
+
+  if (!filepath) {
+    return res.status(400).json({ status: 'fail', message: 'Invalid filename.' });
+  }
 
   if (fs.existsSync(filepath)) {
     res.sendFile(filepath);
@@ -66,13 +92,11 @@ exports.getFile = (req, res) => {
 };
 
 exports.deleteFile = (req, res) => {
-  const filename = req.params.filename;
-  
-  if (!filename || filename.includes('..') || filename.includes('/')) {
+  const filepath = resolveSafePath(req.params.filename);
+
+  if (!filepath) {
     return res.status(400).json({ status: 'fail', message: 'Invalid filename.' });
   }
-
-  const filepath = path.join(__dirname, '../uploads', filename);
 
   if (fs.existsSync(filepath)) {
     fs.unlink(filepath, (err) => {

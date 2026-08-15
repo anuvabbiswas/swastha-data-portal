@@ -5,14 +5,12 @@ import EditUserModal from './EditUserModal';
 import ResetPasswordModal from './ResetPasswordModal';
 
 export default function UserManagement() {
-  const { token, user: loggedInUser } = useAuth();
+  const { authFetch, user: loggedInUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [formData, setFormData] = useState({ employeeId: '', name: '', role: '', password: '' });
   const [formMessage, setFormMessage] = useState({ type: '', text: '' });
-
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -26,7 +24,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await authFetch('/api/users');
       const data = await res.json();
       if (res.ok) setUsers(data.data.users);
       else setError(data.message || 'Failed to fetch users');
@@ -40,15 +38,13 @@ export default function UserManagement() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     setFormMessage({ type: '', text: '' });
-
     try {
-      const res = await fetch('/api/users', {
+      const res = await authFetch('/api/users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-
       if (res.ok) {
         setFormMessage({ type: 'success', text: 'User created successfully!' });
         setFormData({ employeeId: '', name: '', role: '', password: '' });
@@ -62,17 +58,14 @@ export default function UserManagement() {
   };
 
   const handleToggleStatus = async (userId, currentStatus) => {
-
     const confirmMessage = currentStatus === 'ACTIVE' 
       ? 'Are you sure you want to disable this user? They will not be able to log in.' 
       : 'Are you sure you want to re-enable this user?';
       
     if (!window.confirm(confirmMessage)) return;
-
     try {
-      const res = await fetch(`/api/users/${userId}/status`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await authFetch(`/api/users/${userId}/status`, {
+        method: 'PATCH'
       });
       
       if (res.ok) {
@@ -87,17 +80,11 @@ export default function UserManagement() {
   };
 
   const filteredUsers = users.filter(user => {
-    // 1. Search Logic
     const matchesSearch = 
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       user.employeeId.toLowerCase().includes(searchQuery.toLowerCase());
-
-    // 2. Role Filter Logic
     const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
-
-    // 3. Status Filter Logic
     const matchesStatus = statusFilter === 'ALL' || user.status === statusFilter;
-
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -110,7 +97,6 @@ export default function UserManagement() {
   return (
     <div className="p-8">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">User Management</h2>
-
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit xl:col-span-1">
           <h3 className="text-lg font-semibold text-slate-800 mb-4">Create New Associate</h3>
@@ -120,7 +106,6 @@ export default function UserManagement() {
               {formMessage.text}
             </div>
           )}
-
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
@@ -148,12 +133,10 @@ export default function UserManagement() {
             </button>
           </form>
         </div>
-
         <div className="xl:col-span-2 space-y-4">
           
           <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-4 items-end sm:items-center">
             
-            {/* Search Box */}
             <div className="flex-1 w-full relative">
               <label className="sr-only">Search Associates</label>
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -167,8 +150,6 @@ export default function UserManagement() {
                 className="w-full pl-10 p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm"
               />
             </div>
-
-            {/* Role Filter */}
             <div className="w-full sm:w-48">
               <select 
                 value={roleFilter} 
@@ -181,8 +162,6 @@ export default function UserManagement() {
                 <option value="COMMUNITY">Community Associate</option>
               </select>
             </div>
-
-            {/* Status Filter */}
             <div className="w-full sm:w-40">
               <select 
                 value={statusFilter} 
@@ -194,8 +173,6 @@ export default function UserManagement() {
                 <option value="DISABLED">Disabled</option>
               </select>
             </div>
-
-            {/* Clear Filters Button */}
             {(searchQuery !== '' || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
               <button 
                 onClick={clearFilters}
@@ -206,8 +183,6 @@ export default function UserManagement() {
               </button>
             )}
           </div>
-
-          {/* Directory Table */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-6 border-b border-slate-200">
               <h3 className="text-lg font-semibold text-slate-800">Associate Directory</h3>
@@ -260,7 +235,6 @@ export default function UserManagement() {
                           >
                             <Lock className="w-4 h-4" />
                           </button>
-
                           {u.id !== loggedInUser.id && (
                             <button 
                               onClick={() => handleToggleStatus(u.id, u.status, u.role)}

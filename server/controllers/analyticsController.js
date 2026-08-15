@@ -1,21 +1,28 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
+
+const VALID_CATEGORIES = ['MARKETING', 'COMMUNITY'];
 
 exports.getAnalytics = async (req, res) => {
   try {
     const { category, startDate, endDate } = req.query;
-
     if (!category) {
       return res.status(400).json({ status: 'fail', message: 'Category is required (MARKETING or COMMUNITY).' });
+    }
+    if (!VALID_CATEGORIES.includes(category)) {
+      return res.status(400).json({ status: 'fail', message: 'Invalid category. Must be MARKETING or COMMUNITY.' });
     }
 
     // 1. Build the database query filter
     let whereClause = { formType: category };
-
     if (startDate && endDate) {
+      const parsedStart = new Date(startDate);
+      const parsedEnd = new Date(endDate);
+      if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime())) {
+        return res.status(400).json({ status: 'fail', message: 'Invalid startDate or endDate.' });
+      }
       whereClause.submittedAt = {
-        gte: new Date(startDate),
-        lte: new Date(endDate)
+        gte: parsedStart,
+        lte: parsedEnd
       };
     }
 
@@ -30,20 +37,19 @@ exports.getAnalytics = async (req, res) => {
 
     // 3. Aggregate Data in Memory
     submissions.forEach(sub => {
-      const snapshot = typeof sub.schemaSnapshot === 'string' 
-        ? JSON.parse(sub.schemaSnapshot) 
+      const snapshot = typeof sub.schemaSnapshot === 'string'
+        ? JSON.parse(sub.schemaSnapshot)
         : sub.schemaSnapshot;
 
       snapshot.forEach(field => {
         if (['DROPDOWN', 'MULTI_SELECT', 'YES_NO'].includes(field.inputType)) {
-          
+
           if (!questionsMap.has(field.fieldLabel)) {
             questionsMap.set(field.fieldLabel, {
               type: field.inputType,
               counts: {}
             });
           }
-
           const answer = sub.submissionData[field.fieldLabel];
           if (!answer) return;
           const qData = questionsMap.get(field.fieldLabel);
@@ -54,7 +60,6 @@ exports.getAnalytics = async (req, res) => {
             }
             qData.counts[parsedAns] = (qData.counts[parsedAns] || 0) + 1;
           };
-
           if (Array.isArray(answer)) {
             answer.forEach(processAnswer);
           } else {
@@ -69,9 +74,7 @@ exports.getAnalytics = async (req, res) => {
         name: option,
         value: count
       }));
-
       chartDataArray.sort((a, b) => b.value - a.value);
-
       return {
         question,
         type: data.type,
@@ -87,7 +90,6 @@ exports.getAnalytics = async (req, res) => {
         charts: chartsData
       }
     });
-
   } catch (error) {
     console.error("Analytics Aggregation Error:", error);
     res.status(500).json({ status: 'error', message: 'Failed to generate analytics.' });
