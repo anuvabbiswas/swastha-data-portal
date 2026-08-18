@@ -26,7 +26,7 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
 
   const handleNavClick = (id) => {
     setActiveTab(id);
-    setIsMobileOpen(false); // Close menu on mobile after selection
+    setIsMobileOpen(false);
   };
 
   return (
