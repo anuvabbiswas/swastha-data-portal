@@ -14,29 +14,29 @@ function SortableFieldItem({ field, index, onDeactivate, onEdit }) {
     zIndex: isDragging ? 10 : 1,
   };
   return (
-    <li ref={setNodeRef} style={style} className={`p-4 bg-white border-b border-slate-100 flex items-center justify-between group transition-colors ${isDragging ? 'shadow-lg ring-2 ring-brand rounded-lg relative' : 'hover:bg-slate-50'}`}>
-      <div className="flex items-center space-x-4">
-        <div {...attributes} {...listeners} className="cursor-grab hover:bg-slate-100 p-1 rounded active:cursor-grabbing text-slate-400">
+    <li ref={setNodeRef} style={style} className={`p-4 bg-white border-b border-slate-100 flex items-start sm:items-center justify-between group transition-colors flex-col sm:flex-row gap-3 sm:gap-0 ${isDragging ? 'shadow-lg ring-2 ring-brand rounded-lg relative' : 'hover:bg-slate-50'}`}>
+      <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 w-full sm:w-auto overflow-hidden">
+        <div {...attributes} {...listeners} className="cursor-grab hover:bg-slate-100 p-1 rounded active:cursor-grabbing text-slate-400 mt-1 sm:mt-0">
           <GripVertical className="w-5 h-5" />
         </div>
         
-        <div className="flex-shrink-0 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-semibold text-sm">
+        <div className="flex-shrink-0 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-semibold text-sm mt-0.5 sm:mt-0">
           {index + 1}
         </div>
-        <div>
-          <h4 className="text-sm font-semibold text-slate-900 flex items-center">
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-semibold text-slate-900 flex items-center break-words">
             {field.fieldLabel}
-            {field.isRequired && <span className="ml-2 text-red-500 text-xs font-bold" title="Required">*</span>}
+            {field.isRequired && <span className="ml-2 text-red-500 text-xs font-bold flex-shrink-0" title="Required">*</span>}
           </h4>
           {field.description && (
-            <p className="text-xs text-slate-400 mt-0.5">{field.description}</p>
+            <p className="text-xs text-slate-400 mt-0.5 break-words">{field.description}</p>
           )}
-          <div className="flex items-center space-x-2 mt-1">
-            <span className="px-2 py-0.5 bg-brand/10 text-brand-hover rounded text-[10px] font-bold tracking-wider uppercase">
+          <div className="flex flex-wrap items-center gap-2 mt-1.5">
+            <span className="px-2 py-0.5 bg-brand/10 text-brand-hover rounded text-[10px] font-bold tracking-wider uppercase whitespace-nowrap">
               {field.inputType.replace('_', ' ')}
             </span>
             {field.options && Array.isArray(field.options) && (
-              <span className="text-xs text-slate-500 truncate max-w-xs">
+              <span className="text-xs text-slate-500 truncate max-w-[150px] sm:max-w-xs">
                 Options: {field.options.join(', ')}
               </span>
             )}
@@ -45,17 +45,17 @@ function SortableFieldItem({ field, index, onDeactivate, onEdit }) {
       </div>
       
       {/* Action Buttons */}
-      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all">
+      <div className="flex items-center space-x-1 sm:opacity-0 sm:group-hover:opacity-100 transition-all self-end sm:self-auto">
         <button 
           onClick={() => onEdit(field)}
-          className="p-2 text-slate-300 hover:text-brand hover:bg-brand/10 rounded-lg transition-all"
+          className="p-2 text-slate-400 hover:text-brand hover:bg-brand/10 rounded-lg transition-all"
           title="Edit Field"
         >
           <Edit2 className="w-4 h-4" />
         </button>
         <button 
           onClick={() => onDeactivate(field.id, field.fieldLabel)}
-          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
           title="Remove Field"
         >
           <Trash2 className="w-4 h-4" />
@@ -158,19 +158,19 @@ export default function FieldManagement() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-end mb-6">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Form Management</h2>
           <p className="text-slate-500 mt-1">Configure and set form fields.</p>
         </div>
-        <div className="flex bg-slate-200 p-1 rounded-lg">
-          <button onClick={() => setActiveFormType('MARKETING')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing Form</button>
-          <button onClick={() => setActiveFormType('COMMUNITY')} className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community Form</button>
+        <div className="flex w-full md:w-auto bg-slate-200 p-1 rounded-lg overflow-x-auto">
+          <button onClick={() => setActiveFormType('MARKETING')} className={`flex-1 md:flex-none whitespace-nowrap px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing Form</button>
+          <button onClick={() => setActiveFormType('COMMUNITY')} className={`flex-1 md:flex-none whitespace-nowrap px-4 py-2 rounded-md text-sm font-semibold transition-all ${activeFormType === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community Form</button>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
            <h3 className="text-lg font-semibold text-slate-800 mb-4">Add question to {activeFormType.toUpperCase()}</h3>
            {formMessage.text && <div className={`mb-4 p-3 rounded text-sm font-medium ${formMessage.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{formMessage.text}</div>}
            <form onSubmit={handleCreateField} className="space-y-4">
@@ -212,7 +212,7 @@ export default function FieldManagement() {
                      id="allowOther" 
                      checked={formData.allowOther} 
                      onChange={(e) => setFormData({...formData, allowOther: e.target.checked})} 
-                     className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand" 
+                     className="w-4 h-4 flex-shrink-0 text-brand rounded border-slate-300 focus:ring-brand" 
                    />
                    <label htmlFor="allowOther" className="text-sm font-medium text-brand-hover">
                      Include an "Other" option with text input
@@ -221,16 +221,16 @@ export default function FieldManagement() {
                </div>
              )}
              <div className="flex items-center space-x-2 pt-2">
-               <input type="checkbox" id="isRequired" checked={formData.isRequired} onChange={(e) => setFormData({...formData, isRequired: e.target.checked})} className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand" />
+               <input type="checkbox" id="isRequired" checked={formData.isRequired} onChange={(e) => setFormData({...formData, isRequired: e.target.checked})} className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand flex-shrink-0" />
                <label htmlFor="isRequired" className="text-sm font-medium text-slate-700">Make this question required</label>
              </div>
              <button type="submit" className="w-full bg-brand text-white font-semibold py-2 rounded-lg hover:bg-brand-hover mt-2">Add Field to Form</button>
            </form>
         </div>
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+          <div className="p-4 md:p-6 border-b border-slate-200 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-slate-800">Current Form Layout of {activeFormType.toUpperCase()}</h3>
-            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium">{fields.length} Active Fields</span>
+            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium whitespace-nowrap ml-2">{fields.length} Active Fields</span>
           </div>
           
           <div className="p-0">

@@ -95,10 +95,10 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">User Management</h2>
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit xl:col-span-1">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
+        <div className="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-slate-200 h-fit xl:col-span-1">
           <h3 className="text-lg font-semibold text-slate-800 mb-4">Create New Associate</h3>
           
           {formMessage.text && (
@@ -135,7 +135,7 @@ export default function UserManagement() {
         </div>
         <div className="xl:col-span-2 space-y-4">
           
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-end md:items-center">
             
             <div className="flex-1 w-full relative">
               <label className="sr-only">Search Associates</label>
@@ -150,7 +150,7 @@ export default function UserManagement() {
                 className="w-full pl-10 p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand text-sm"
               />
             </div>
-            <div className="w-full sm:w-48">
+            <div className="w-full md:w-48">
               <select 
                 value={roleFilter} 
                 onChange={(e) => setRoleFilter(e.target.value)}
@@ -162,7 +162,7 @@ export default function UserManagement() {
                 <option value="COMMUNITY">Community Associate</option>
               </select>
             </div>
-            <div className="w-full sm:w-40">
+            <div className="w-full md:w-40">
               <select 
                 value={statusFilter} 
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -176,7 +176,7 @@ export default function UserManagement() {
             {(searchQuery !== '' || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
               <button 
                 onClick={clearFilters}
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors w-full sm:w-auto justify-center whitespace-nowrap"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors w-full md:w-auto justify-center whitespace-nowrap"
               >
                 <XCircle className="w-4 h-4 mr-2" />
                 Clear
@@ -184,7 +184,7 @@ export default function UserManagement() {
             )}
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-200">
+            <div className="p-4 md:p-6 border-b border-slate-200">
               <h3 className="text-lg font-semibold text-slate-800">Associate Directory</h3>
             </div>
             
@@ -194,32 +194,32 @@ export default function UserManagement() {
               ) : error ? (
                 <div className="p-8 text-center text-red-500">{error}</div>
               ) : (
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
-                      <th className="p-4 font-medium">Employee ID</th>
-                      <th className="p-4 font-medium">Name</th>
-                      <th className="p-4 font-medium">Role</th>
-                      <th className="p-4 font-medium">Status</th>
-                      <th className="p-4 font-medium text-right">Actions</th>
+                      <th className="p-4 font-medium whitespace-nowrap">Employee ID</th>
+                      <th className="p-4 font-medium whitespace-nowrap">Name</th>
+                      <th className="p-4 font-medium whitespace-nowrap">Role</th>
+                      <th className="p-4 font-medium whitespace-nowrap">Status</th>
+                      <th className="p-4 font-medium text-right whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm">
                     {filteredUsers.map((u) => (
                       <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                        <td className="p-4 font-medium text-slate-900">{u.employeeId}</td>
-                        <td className="p-4 text-slate-700">{u.name}</td>
-                        <td className="p-4">
+                        <td className="p-4 font-medium text-slate-900 whitespace-nowrap">{u.employeeId}</td>
+                        <td className="p-4 text-slate-700 whitespace-nowrap">{u.name}</td>
+                        <td className="p-4 whitespace-nowrap">
                           <span className="px-2 py-1 bg-brand/10 text-brand-hover rounded text-xs font-semibold">
                             {u.role.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 whitespace-nowrap">
                           <span className={`px-2 py-1 rounded text-xs font-semibold ${u.status === 'ACTIVE' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                             {u.status}
                           </span>
                         </td>
-                        <td className="p-4 text-right space-x-2">
+                        <td className="p-4 text-right space-x-2 whitespace-nowrap">
                           <button 
                             onClick={() => setEditingUser(u)}
                             className="inline-flex items-center p-1.5 text-slate-400 hover:text-brand hover:bg-brand/10 rounded transition-colors"

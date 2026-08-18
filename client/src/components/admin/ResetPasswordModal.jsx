@@ -66,20 +66,20 @@ export default function ResetPasswordModal({ user, onClose }) {
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col overflow-hidden">
         
-        <div className="flex justify-between items-center p-6 border-b border-slate-100">
+        <div className="flex justify-between items-center p-4 md:p-6 border-b border-slate-100">
           <div>
             <h2 className="text-xl font-bold text-slate-800">Reset Password</h2>
-            <p className="text-xs text-slate-500 mt-1">For: {user.name} ({user.employeeId})</p>
+            <p className="text-xs text-slate-500 mt-1 break-words">For: {user.name} ({user.employeeId})</p>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6">
+        <div className="p-4 md:p-6 overflow-y-auto">
           {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">{error}</div>}
           {success && (
             <div className="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg border border-green-200 flex items-center">
-              <CheckCircle2 className="w-5 h-5 mr-2" /> Password reset successfully!
+              <CheckCircle2 className="w-5 h-5 flex-shrink-0 mr-2" /> Password reset successfully!
             </div>
           )}
           {!success && (
@@ -134,30 +134,30 @@ export default function ResetPasswordModal({ user, onClose }) {
           )}
         </div>
         {!success && (
-          <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
+          <div className="p-4 md:p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
             {step === 1 ? (
               <>
-                <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                <button type="button" onClick={onClose} className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
                   Cancel
                 </button>
                 <button 
                   type="button" 
                   onClick={handleNext}
-                  className="px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors"
+                  className="w-full sm:w-auto px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors"
                 >
                   Next
                 </button>
               </>
             ) : (
               <>
-                <button type="button" onClick={handleBack} disabled={isSubmitting} className="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                <button type="button" onClick={handleBack} disabled={isSubmitting} className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
                   Back
                 </button>
                 <button 
                   type="button" 
                   onClick={handleSubmit} 
                   disabled={isSubmitting}
-                  className={`px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full sm:w-auto px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
                   {isSubmitting ? 'Confirming...' : 'Confirm'}
                 </button>

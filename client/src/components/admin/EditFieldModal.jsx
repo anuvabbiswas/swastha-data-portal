@@ -59,13 +59,13 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center p-6 border-b border-slate-100">
+        <div className="flex justify-between items-center p-4 md:p-6 border-b border-slate-100 shrink-0">
           <h2 className="text-xl font-bold text-slate-800">Edit Question</h2>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <form onSubmit={handleUpdateField} className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
+        <form onSubmit={handleUpdateField} className="p-4 md:p-6 space-y-4 overflow-y-auto max-h-[60vh] md:max-h-[70vh]">
           {error && (
             <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium">{error}</div>
           )}
@@ -126,7 +126,7 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
                   id="edit-allowOther"
                   checked={formData.allowOther}
                   onChange={(e) => setFormData({ ...formData, allowOther: e.target.checked })}
-                  className="w-4 h-4 text-brand rounded border-slate-300 focus:ring-brand"
+                  className="w-4 h-4 flex-shrink-0 text-brand rounded border-slate-300 focus:ring-brand"
                 />
                 <label htmlFor="edit-allowOther" className="text-sm font-medium text-brand-hover">
                   Include an "Other" option with text input
@@ -140,18 +140,18 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
               id="edit-required"
               checked={formData.isRequired}
               onChange={(e) => setFormData({ ...formData, isRequired: e.target.checked })}
-              className="w-4 h-4 text-brand bg-slate-100 border-slate-300 rounded focus:ring-brand"
+              className="w-4 h-4 flex-shrink-0 text-brand bg-slate-100 border-slate-300 rounded focus:ring-brand"
             />
             <label htmlFor="edit-required" className="ml-2 text-sm font-medium text-slate-700">
               Make this field required
             </label>
           </div>
         </form>
-        <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
+        <div className="p-4 md:p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
+            className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -159,7 +159,7 @@ export default function EditFieldModal({ field, onClose, onRefresh }) {
             type="button"
             onClick={handleUpdateField}
             disabled={isSubmitting}
-            className={`px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full sm:w-auto px-5 py-2.5 text-sm font-bold text-white bg-brand rounded-lg hover:bg-brand-hover transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>

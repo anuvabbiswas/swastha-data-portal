@@ -53,17 +53,17 @@ export default function Analytics() {
     : data.charts.filter(c => c.question === selectedQuestion);
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       
       {/* 1. Header & Category Toggle */}
-      <div className="flex justify-between items-end mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Analytics</h2>
           <p className="text-slate-500 mt-1">Visualize data distributions and trends.</p>
         </div>
-        <div className="flex bg-slate-200 p-1 rounded-lg shadow-inner">
-          <button onClick={() => { setCategory('MARKETING'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing</button>
-          <button onClick={() => { setCategory('COMMUNITY'); setSelectedQuestion('ALL'); }} className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community</button>
+        <div className="flex w-full md:w-auto bg-slate-200 p-1 rounded-lg shadow-inner">
+          <button onClick={() => { setCategory('MARKETING'); setSelectedQuestion('ALL'); }} className={`flex-1 md:flex-none px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'MARKETING' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Marketing</button>
+          <button onClick={() => { setCategory('COMMUNITY'); setSelectedQuestion('ALL'); }} className={`flex-1 md:flex-none px-5 py-2 rounded-md text-sm font-semibold transition-all ${category === 'COMMUNITY' ? 'bg-white text-brand shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Community</button>
         </div>
       </div>
       {/* 2. Control Bar (Filters & Total Card) */}
@@ -104,7 +104,7 @@ export default function Analytics() {
             </select>
           </div>
           {(startDate || endDate) && (
-            <button onClick={clearDateFilter} className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors justify-center whitespace-nowrap">
+            <button onClick={clearDateFilter} className="flex items-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors justify-center whitespace-nowrap w-full md:w-auto">
               <XCircle className="w-4 h-4 mr-2" /> Clear Dates
             </button>
           )}
@@ -114,17 +114,17 @@ export default function Analytics() {
       {loading ? (
         <div className="text-center p-12 text-slate-500 font-medium">Analyzing data...</div>
       ) : data.charts.length === 0 ? (
-        <div className="text-center bg-white p-12 rounded-xl shadow-sm border border-slate-200">
+        <div className="text-center bg-white p-6 md:p-12 rounded-xl shadow-sm border border-slate-200">
           <PieChart className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No analyzable questions found in this category.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
           {displayedCharts.map((chart, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+            <div key={idx} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
               
               <div className="border-b border-slate-100 pb-4 mb-4">
-                <h3 className="text-base font-bold text-slate-800 pr-4">{chart.question}</h3>
+                <h3 className="text-base font-bold text-slate-800 pr-4 break-words">{chart.question}</h3>
                 <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-semibold">
                   {chart.type.replace('_', ' ')}
                 </p>
@@ -139,7 +139,7 @@ export default function Analytics() {
                   <ResponsiveContainer width="100%" height={300}>
                     {['DROPDOWN', 'YES_NO'].includes(chart.type) ? (
                       <RePieChart>
-                        <Pie data={chart.data} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={2} dataKey="value">
+                        <Pie data={chart.data} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value">
                           {chart.data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
@@ -150,13 +150,13 @@ export default function Analytics() {
                                 return [`${value} responses (${percentage}%)`, 'Count'];
                             }}
                         />
-                        <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: '20px' }} />
+                        <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
                       </RePieChart>
                     ) : (
-                      <BarChart data={chart.data} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <BarChart data={chart.data} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                        <XAxis type="number" allowDecimals={false} />
-                        <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10 }} />
+                        <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
                         <Tooltip cursor={{ fill: '#f8fafc' }} formatter={(value) => {
                                 const total = chart.data.reduce((sum, item) => sum + item.value, 0);
                                 const percentage = ((value / total) * 100).toFixed(0);
