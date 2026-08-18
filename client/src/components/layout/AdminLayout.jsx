@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, FileText, FileClock, LogOut, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Footer from './Footer';
+import logo from '../../assets/logo1.png';
 
 export default function AdminLayout({ children, activeTab, setActiveTab }) {
   const { logout, user } = useAuth();
@@ -35,8 +36,17 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
         </button>
 
         <div className={`p-6 border-b border-slate-800 transition-all duration-300 ${isCollapsed ? 'text-center px-2' : ''}`}>
+          <div className={`flex ${isCollapsed ? 'justify-center' : ''} mb-3`}>
+            <div className={`overflow-hidden rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${isCollapsed ? 'w-10 h-10' : 'w-12 h-12'}`}>
+              <img
+                src={logo}
+                alt="Swastha Hospital Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
           <h1 className={`font-bold transition-all whitespace-nowrap overflow-hidden ${isCollapsed ? 'text-sm' : 'text-xl'}`}>
-            {isCollapsed ? 'ADM' : 'Admin'}
+            {isCollapsed ? 'ADM' : user?.name}
           </h1>
           {!isCollapsed && <p className="text-sm text-slate-400 mt-1 truncate">ID: {user?.employeeId}</p>}
         </div>

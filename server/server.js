@@ -18,9 +18,7 @@ const app = express();
 // Global Middleware
 app.use(helmet());
 
-// CORS: only relevant now for local dev (Vite dev server on a different port).
-// In production, frontend and backend are served from the same origin, so
-// this header is a no-op there but harmless to leave in place.
+// CORS
 const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
 app.use(cors({
   origin: allowedOrigin,
@@ -71,14 +69,9 @@ app.use('/api', (req, res) => {
   res.status(404).json({ status: 'fail', message: 'API route not found.' });
 });
 
-// --- Serve the built React frontend ---
-// client/dist is produced by `npm run build` inside the client workspace.
 const clientBuildPath = path.join(__dirname, '../client/dist');
 app.use(express.static(clientBuildPath));
 
-// Catch-all: any non-API route serves index.html, letting React Router
-// handle client-side routing (e.g. /admin, /associate, /login all resolve
-// to the same index.html, and the frontend router takes it from there).
 app.get('*', (req, res) => {
   res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
